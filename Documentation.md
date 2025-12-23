@@ -35,8 +35,13 @@ WEEK 4:
     *Also very hard week
 
 
-12/23/25
+12/22/25
 
     So I am trying to learn how to use the mutagen library, installing it and 
 learning its classes and all that. Trying to use this website to learn about the module
 Will put it in the refernces section of this doc.
+
+12/23/25
+
+    So what I need to do is learn the methods that will allow me to read music 
+    files into a list, or at least the names/tags of them. 
