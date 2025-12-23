@@ -8,6 +8,7 @@ import importlib # used to import modules in runtime
 
 
 musicexample = os.path.join(os.getcwd(), "MusicExamples")
-print(musicexample)
 
+for file in musicexample:
+    musiclist = 
 
