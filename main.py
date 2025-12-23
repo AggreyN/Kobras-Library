@@ -6,9 +6,16 @@ import sys
 
 import importlib # used to import modules in runtime
 
+music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
+music_files = []
 
-musicexample = os.path.join(os.getcwd(), "MusicExamples")
+# Walk through all subfolders
+for root, dirs, files in os.walk(music_folder):
+    for file in files:
+        if file.endswith((".mp3", ".wav", ".m4a", ".flac")):
+            full_path = os.path.join(root, file)
+            music_files.append(full_path)
 
-for file in musicexample:
-    musiclist = 
-
+print(f"Found {len(music_files)} music files")
+for file in music_files:
+    print(file)
