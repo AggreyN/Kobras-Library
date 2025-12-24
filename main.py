@@ -12,25 +12,58 @@ import importlib # used to import modules in runtime
 import glob
 import pprint
 
-prefix = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples\\"
+
+
+
+
+import tkinter as tk
+
+root = tk.Tk()
+
+root.mainloop()
+
+
+
+
+
+
+
+
+prefix = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples\\" #for simplicity purposes
 
 
 #pulling from a file and displaying the tags
 
+userfile = input("Enter the file name")
 mp3_file = EasyID3(prefix + 'Halfcrazy.mp3')
 print("MP3 Tags:")
-pprint.pprint(mp3_file)
+pprint.pprint(mp3_file) #this is to have the files print out nice 
+
+
+
 # Access specific tags:
 print(f"Title: {mp3_file['title']}")
 print(f"Artist: {mp3_file['artist']}")
 
 
-class MusicFile:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.metadata = self._read_metadata()
-        self.duration = self._read_duration()
 
+
+class Kobralib():
+    """
+    Docstring for Kobralib   
+    This class will display the main menu for the library where the use can choose from,
+        - Adding a to the Library
+        - Viewing Library
+        - Deleting from the file
+        - Viewing Genres
+        - Exiting the menu
+        * These are preliminary as for now VERY subject to change
+    Attributes:
+        Folderfile(str): the folder in which we will be pulling from (as of rn) for code
+    """
+    def __init__(self,folderfile,):
+        self.folderfile = folderfile
+        
 
 
 def hi():
