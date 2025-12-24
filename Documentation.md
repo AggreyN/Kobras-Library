@@ -45,3 +45,12 @@ Will put it in the refernces section of this doc.
 
     So what I need to do is learn the methods that will allow me to read music 
     files into a list, or at least the names/tags of them. 
+
+12/24/24
+
+    Merry Christmas Eve, I am currently working on trying to display the id3 tags,
+(the information from the file). I do not know if I want the user to input their
+directory and then pull the music from there, or ask them every time for the directory.
+I don't really know how ot use pathlib/sys/os that much so I am in the process of learning how to use it for 
+what is neccessary within this project. But I have to have a lot more progress before
+I can move on to next weeks stuff.
