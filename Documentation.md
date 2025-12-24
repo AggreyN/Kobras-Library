@@ -54,3 +54,8 @@ directory and then pull the music from there, or ask them every time for the dir
 I don't really know how ot use pathlib/sys/os that much so I am in the process of learning how to use it for 
 what is neccessary within this project. But I have to have a lot more progress before
 I can move on to next weeks stuff.
+
+    Just realized that I could make it sort of like a game where you would have a menu. So
+it would have, add new song, view library, delete song. So this would all be within a class.
+Would I need functions within functions?? I am pretty sure. I want the user to be able to either view all
+the information, like the genre, bpm, artist, all that.
