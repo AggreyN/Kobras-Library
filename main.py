@@ -18,9 +18,8 @@ import pprint
 
 import tkinter as tk
 
-root = tk.Tk()
-
-root.mainloop()
+display = tk.Tk()
+display.mainloop()
 
 
 
