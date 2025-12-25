@@ -18,8 +18,8 @@ import pprint
 
 import tkinter as tk
 
-display = tk.Tk()
-display.mainloop()
+display = tk.Tk() #this will create the display basically
+display.mainloop() #this makes the display continue consistently Im pretty sure
 
 
 
