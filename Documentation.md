@@ -59,3 +59,6 @@ I can move on to next weeks stuff.
 it would have, add new song, view library, delete song. So this would all be within a class.
 Would I need functions within functions?? I am pretty sure. I want the user to be able to either view all
 the information, like the genre, bpm, artist, all that.
+
+    Experienced a problem with always pushing the music example files so I used gitignore
+to ignore the whole MusicExample folder.
