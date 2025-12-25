@@ -18,11 +18,22 @@ import pprint
 
 import tkinter as tk
 
-display = tk.Tk() #this will create the display basically
-display.mainloop() #this makes the display continue consistently Im pretty sure
+def KobraGUI():
+    display = tk.Tk() #this will create the display basically
+    
+    display.geometry("800x600") #setting up dimentions
+    display.title("Kobras Library")
+    
+    label = tk.Label(display, text = "Welcome to Kobra's Library", font = ('Helvetica', 12)) #creating a simple label for testing
+    label.pack()
+    # the pack func tells python where to put the code
+    
+    
+    display.mainloop() #this makes the display continue consistently Im pretty sure
+    
 
 
-
+KobraGUI()
 
 
 
