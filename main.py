@@ -24,11 +24,16 @@ def KobraGUI():
     display.geometry("800x600") #setting up dimentions
     display.title("Kobras Library")
     
-    label = tk.Label(display, text = "Welcome to Kobra's Library", font = ('Helvetica', 12)) #creating a simple label for testing
-    label.pack()
-    # the pack func tells python where to put the code
+    label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22))#creating a simple label for testing
+    label.pack(padx=40, pady= 20)
+    # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
+    
+    textbox = tk.Text(display, text = "Type Your Name: " height = 3, font = ('Helvetica', 15)) #a textbox
+    textbox.pack(padx= 10)
     
     
+    button = tk.Button(display, text = "Click for Menu!", font = ('Helvetica', 20))
+    button.pack(padx = 10, pady = 10)
     display.mainloop() #this makes the display continue consistently Im pretty sure
     
 
@@ -44,7 +49,7 @@ prefix = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library
 
 #pulling from a file and displaying the tags
 
-userfile = input("Enter the file name")
+userfile = input("Enter the file name: ")
 mp3_file = EasyID3(prefix + 'Halfcrazy.mp3')
 print("MP3 Tags:")
 pprint.pprint(mp3_file) #this is to have the files print out nice 
