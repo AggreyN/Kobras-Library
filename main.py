@@ -21,34 +21,35 @@ import tkinter as tk
 def KobraGUI():
     display = tk.Tk() #this will create the display basically
     
-    display.geometry("800x600") #setting up dimentions
+    display.geometry("500x550") #setting up dimentions
     display.title("Kobras Library")
-    
+    display.configure(bg="dark green") 
+
     label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22))#creating a simple label for testing
     label.pack(padx=40, pady= 20)
     # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
     
     textbox = tk.Text(display, height = 3, font = ('Helvetica', 15)) #a textbox
-    textbox.pack(padx= 10)
     
     
     button = tk.Button(display, text = "Click for Menu!", font = ('Helvetica', 20))
-    button.pack(padx = 10, pady = 10)
     
     #this frame will have all the buttons in order to work the library 
     
-    dpframe = tk.Frame(display, bg="#667eea", height = 100, padx = 20, pady = 100)
+    dpframe = tk.Frame(display, bg="#355E3B", height = 100, padx = 20, pady = 40)
     dpframe.pack(side = "top", fill = "y")
 
-    dpflabel = tk.Label(dpframe, text="Menu").pack(side = "top")
+    dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
 
-    dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15), width = 20)
-    dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 15), width = 20)
-    dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15), width = 20)
-    
+    dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
+    dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20)
+    dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
+    dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
+
     dpfbutton1.pack(pady = 5)
-    dpfbutton1.pack(pady = 5)
-    dpfbutton1.pack(pady = 5)
+    dpfbutton2.pack(pady = 5)
+    dpfbutton3.pack(pady = 5)
+    dpfbutton4.pack(pady = 5)
 
 
     
