@@ -28,12 +28,30 @@ def KobraGUI():
     label.pack(padx=40, pady= 20)
     # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
     
-    textbox = tk.Text(display, text = "Type Your Name: " height = 3, font = ('Helvetica', 15)) #a textbox
+    textbox = tk.Text(display, height = 3, font = ('Helvetica', 15)) #a textbox
     textbox.pack(padx= 10)
     
     
     button = tk.Button(display, text = "Click for Menu!", font = ('Helvetica', 20))
     button.pack(padx = 10, pady = 10)
+    
+    #this frame will have all the buttons in order to work the library 
+    
+    dpframe = tk.Frame(display, bg="#667eea", height = 80)
+    
+    dpflabel = tk.Label(dpframe, text="Menu").pack(side="left")
+
+    dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15))
+    dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 15))
+    dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15))
+    
+    dpfbutton1.pack(side = "left")
+    dpfbutton1.pack()
+    dpfbutton1.pack(side = "right")
+
+
+    dpframe.pack()
+    
     display.mainloop() #this makes the display continue consistently Im pretty sure
     
 
