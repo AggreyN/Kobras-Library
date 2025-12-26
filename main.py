@@ -37,20 +37,20 @@ def KobraGUI():
     
     #this frame will have all the buttons in order to work the library 
     
-    dpframe = tk.Frame(display, bg="#667eea", height = 80)
+    dpframe = tk.Frame(display, bg="#667eea", height = 100, padx = 20, pady = 100)
+    dpframe.pack(side = "top", fill = "y")
+
+    dpflabel = tk.Label(dpframe, text="Menu").pack(side = "top")
+
+    dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15), width = 20)
+    dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 15), width = 20)
+    dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15), width = 20)
     
-    dpflabel = tk.Label(dpframe, text="Menu").pack(side="left")
-
-    dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15))
-    dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 15))
-    dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 15))
-    
-    dpfbutton1.pack(side = "left")
-    dpfbutton1.pack()
-    dpfbutton1.pack(side = "right")
+    dpfbutton1.pack(pady = 5)
+    dpfbutton1.pack(pady = 5)
+    dpfbutton1.pack(pady = 5)
 
 
-    dpframe.pack()
     
     display.mainloop() #this makes the display continue consistently Im pretty sure
     
