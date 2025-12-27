@@ -23,7 +23,7 @@ def KobraGUI():
     
     display.geometry("500x550") #setting up dimentions
     display.title("Kobras Library")
-    display.configure(bg="dark green") 
+    display.configure(bg="navy blue") 
 
     label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22))#creating a simple label for testing
     label.pack(padx=40, pady= 20)
@@ -36,7 +36,7 @@ def KobraGUI():
     
     #this frame will have all the buttons in order to work the library 
     
-    dpframe = tk.Frame(display, bg="#355E3B", height = 100, padx = 20, pady = 40)
+    dpframe = tk.Frame(display, bg="blue", height = 100, padx = 20, pady = 40)
     dpframe.pack(side = "top", fill = "y")
 
     dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
@@ -50,15 +50,20 @@ def KobraGUI():
     dpfbutton2.pack(pady = 5)
     dpfbutton3.pack(pady = 5)
     dpfbutton4.pack(pady = 5)
+    
+    menubar = tk.Menu(display)
+    
+    display.config(menu=menubar)
+
+    # Create File menu
+    file_menu = tk.Menu(menubar, tearoff=0)
+    menubar.add_cascade(label="File", menu=file_menu)
+
 
 
     
     display.mainloop() #this makes the display continue consistently Im pretty sure
     
-
-
-KobraGUI()
-
 
 
 
