@@ -12,58 +12,79 @@ import importlib # used to import modules in runtime
 import glob
 import pprint
 
-
-
-
-
 import tkinter as tk
 
-def KobraGUI():
-    display = tk.Tk() #this will create the display basically
-    
-    display.geometry("500x550") #setting up dimentions
-    display.title("Kobras Library")
-    display.configure(bg="navy blue") 
 
-    label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22))#creating a simple label for testing
-    label.pack(padx=40, pady= 20)
-    # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
-    
-    textbox = tk.Text(display, height = 3, font = ('Helvetica', 15)) #a textbox
-    
-    
-    button = tk.Button(display, text = "Click for Menu!", font = ('Helvetica', 20))
-    
-    #this frame will have all the buttons in order to work the library 
-    
-    dpframe = tk.Frame(display, bg="blue", height = 100, padx = 20, pady = 40)
-    dpframe.pack(side = "top", fill = "y")
+class Kobraslib():
+    """
+    Docstring for Kobralib   
+    This class will display the main menu for the library where the use can choose from,
+        - Adding a to the Library
+        - Viewing Library
+        - Deleting from the file
+        - Viewing Genres
+        - Exiting the menu
+        * These are preliminary as for now VERY subject to change
+    Attributes:
+        Folderfile(str): the folder in which we will be pulling from (as of rn) for code
+    """
+    def __init__(self, display, file):
+        """
+        Initializes Kobraslib with display and filepath.
+        Uses tkinter to make a GUI for the library menu.
+        Attributes:
+            display (tk.Tk): The tkinter display object.
+            file (str): The path to the music file.
+        """
+        self.display = display
+        self.file = file
+        
+    def KobraGUI():
+        display = tk.Tk() #this will create the display basically
+        
+        display.geometry("500x550") #setting up dimentions
+        display.title("Kobras Library")
+        display.configure(bg="navy blue") 
 
-    dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
+        label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22))#creating a simple label for testing
+        label.pack(padx=40, pady= 20)
+        # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
+        
+        textbox = tk.Text(display, height = 3, font = ('Helvetica', 15)) #a textbox
+        
+        
+        button = tk.Button(display, text = "Click for Menu!", font = ('Helvetica', 20))
+        
+        #this frame will have all the buttons in order to work the library 
+        
+        dpframe = tk.Frame(display, bg="blue", height = 100, padx = 20, pady = 40)
+        dpframe.pack(side = "top", fill = "y")
 
-    dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
-    dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20)
-    dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
-    dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
+        dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
 
-    dpfbutton1.pack(pady = 5)
-    dpfbutton2.pack(pady = 5)
-    dpfbutton3.pack(pady = 5)
-    dpfbutton4.pack(pady = 5)
-    
-    menubar = tk.Menu(display)
-    
-    display.config(menu=menubar)
+        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
+        dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20)
+        dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
+        dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
 
-    # Create File menu
-    file_menu = tk.Menu(menubar, tearoff=0)
-    menubar.add_cascade(label="File", menu=file_menu)
+        dpfbutton1.pack(pady = 5)
+        dpfbutton2.pack(pady = 5)
+        dpfbutton3.pack(pady = 5)
+        dpfbutton4.pack(pady = 5)
+        
+        menubar = tk.Menu(display)
+        
+        display.config(menu=menubar)
+
+        # Create File menu
+        file_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="File", menu=file_menu)
 
 
 
-    
-    display.mainloop() #this makes the display continue consistently Im pretty sure
-    
+        
+        display.mainloop() #this makes the display continue consistently Im pretty sure
+        
 
 
 
@@ -85,21 +106,13 @@ print(f"Title: {mp3_file['title']}")
 print(f"Artist: {mp3_file['artist']}")
 
 
+#file scanner creation
 
+def filescanner(display):
+    finput = display.askopenfilename()
 
-class Kobralib():
-    """
-    Docstring for Kobralib   
-    This class will display the main menu for the library where the use can choose from,
-        - Adding a to the Library
-        - Viewing Library
-        - Deleting from the file
-        - Viewing Genres
-        - Exiting the menu
-        * These are preliminary as for now VERY subject to change
-    Attributes:
-        Folderfile(str): the folder in which we will be pulling from (as of rn) for code
-    """
+class Kobrali():
+   
     def __init__(self,folderfile,):
         self.folderfile = folderfile
         
