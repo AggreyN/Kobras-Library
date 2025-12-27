@@ -68,6 +68,9 @@ this will prevent confusion and add simplicity, for the user not me unfortunatel
 
     Through watching a youtube video, I realized that there are simpler ways to create a menu.
 As in there's a menu function within the tkinter module. The more you know, I will learn a lot over the next three weeks.
-But I will now stop procrastinating and complete the base file scanner.
+But I will now stop procrastinating and complete the base file scanner. But as for now the GUI 
+has been 60% completed and all I need to do is add commands for functioanality.
+
+
 
 
