@@ -61,4 +61,13 @@ Would I need functions within functions?? I am pretty sure. I want the user to b
 the information, like the genre, bpm, artist, all that.
 
     Experienced a problem with always pushing the music example files so I used gitignore
-to ignore the whole MusicExample folder.
+to ignore the whole MusicExample folder. I will use a GUI, first time, to make it more interactive
+this will prevent confusion and add simplicity, for the user not me unfortunately.
+
+12/27/25
+
+    Through watching a youtube video, I realized that there are simpler ways to create a menu.
+As in there's a menu function within the tkinter module. The more you know, I will learn a lot over the next three weeks.
+But I will now stop procrastinating and complete the base file scanner.
+
+
