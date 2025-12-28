@@ -71,6 +71,16 @@ As in there's a menu function within the tkinter module. The more you know, I wi
 But I will now stop procrastinating and complete the base file scanner. But as for now the GUI 
 has been 60% completed and all I need to do is add commands for functioanality.
 
+12/28/25
+
+    I have finished the file scanner that will be a command within the display!
+It was way easier than I thought it would have to be, now I have to learn how to create,
+a database in which the meta/audio data of the files will come from. As of right now,
+I have typed out the directory in which the file will be opening from, but in the actual 
+project, the user won't be able to pull from my directory. So I will probably change the 
+path to the music folder of the user or just have them select the path that they want to be 
+pulling from. But I want everything to be showing up on the GUI so idk how that will work.
+
 
 
 
