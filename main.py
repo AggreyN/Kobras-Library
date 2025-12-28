@@ -13,7 +13,7 @@ import glob
 import pprint
 
 import tkinter as tk
-
+from tkinter import filedialog
 
 class Kobraslib():
     """
@@ -28,7 +28,7 @@ class Kobraslib():
     Attributes:
         Folderfile(str): the folder in which we will be pulling from (as of rn) for code
     """
-    def __init__(self, display, file):
+    def __init__(self, display, file, musicdict):
         """
         Initializes Kobraslib with display and filepath.
         Uses tkinter to make a GUI for the library menu.
@@ -38,8 +38,12 @@ class Kobraslib():
         """
         self.display = display
         self.file = file
-        
+        self.musicdict = musicdict
     def KobraGUI():
+        """
+        This will display the window, which is the basis of how this whole thing will work
+        There will be a menu in which you can select add files to a viewable list. 
+        """
         display = tk.Tk() #this will create the display basically
         
         display.geometry("500x550") #setting up dimentions
@@ -85,6 +89,30 @@ class Kobraslib():
         
         display.mainloop() #this makes the display continue consistently Im pretty sure
         
+        return display 
+    def filescanner(display):
+        music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
+
+        kbfile = display.askopenfilename(initialdir = music_folder, filetypes = [("Music", "*.mp3")])
+        mp3file = EasyID3(kbfile)
+        
+        print("These are the MP3 tags: \n")
+        pprint.pprint(mp3file)
+        
+        print(f"Title: {mp3_file['title']}")
+        print(f"Artist: {mp3_file['artist']}")
+        print(f"Length: {mp3_file['length']}")
+        print(f"BPM: {mp3_file['bpm']}")
+        print(f"Date: {mp3_file['date']}")
+
+    def addsong():
+        pass
+    
+        
+
+
+
+
 
 
 
@@ -94,8 +122,7 @@ prefix = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library
 
 #pulling from a file and displaying the tags
 
-userfile = input("Enter the file name: ")
-mp3_file = EasyID3(prefix + 'Halfcrazy.mp3')
+mp3_file = EasyID3(prefix + 'Molotov.mp3')
 print("MP3 Tags:")
 pprint.pprint(mp3_file) #this is to have the files print out nice 
 
@@ -106,16 +133,9 @@ print(f"Title: {mp3_file['title']}")
 print(f"Artist: {mp3_file['artist']}")
 
 
-#file scanner creation
 
-def filescanner(display):
-    finput = display.askopenfilename()
 
-class Kobrali():
-   
-    def __init__(self,folderfile,):
-        self.folderfile = folderfile
-        
+
 
 
 def hi():
