@@ -28,7 +28,7 @@ class Kobraslib():
     Attributes:
         Folderfile(str): the folder in which we will be pulling from (as of rn) for code
     """
-    def __init__(self, display, file, musicdict):
+    def __init__(self, display = None, file = None ):
         """
         Initializes Kobraslib with display and filepath.
         Uses tkinter to make a GUI for the library menu.
@@ -38,8 +38,8 @@ class Kobraslib():
         """
         self.display = display
         self.file = file
-        self.musicdict = musicdict
-    def KobraGUI():
+        self.musicdict = {}
+    def KobraGUI(display):
         """
         This will display the window, which is the basis of how this whole thing will work
         There will be a menu in which you can select add files to a viewable list. 
@@ -68,7 +68,7 @@ class Kobraslib():
 
         dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
         dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20)
-        dpfbutton3 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
+        dpfbutton3 = tk.Button(dpframe, text = "Delete  Song", font = ('Helvetica', 18), width = 20)
         dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
 
         dpfbutton1.pack(pady = 5)
@@ -89,23 +89,42 @@ class Kobraslib():
         
         display.mainloop() #this makes the display continue consistently Im pretty sure
         
-        return display 
+        return display #used so that I can use the info from it within other stuff
+    
     def filescanner(display):
         music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
 
-        kbfile = display.askopenfilename(initialdir = music_folder, filetypes = [("Music", "*.mp3")])
-        mp3file = EasyID3(kbfile)
+        kbfile = filedialog.askopenfilename(initialdir = music_folder, filetypes = [("Music", "*.mp3")])
+        kbfile
         
-        print("These are the MP3 tags: \n")
-        pprint.pprint(mp3file)
+        if not kbfile:          #used if the user does not select a file
+            print("No File selected.")
+            return 
         
-        print(f"Title: {mp3_file['title']}")
-        print(f"Artist: {mp3_file['artist']}")
-        print(f"Length: {mp3_file['length']}")
-        print(f"BPM: {mp3_file['bpm']}")
-        print(f"Date: {mp3_file['date']}")
+        audio = MP3(kbfile)
+        tags = EasyID3(kbfile)
 
-    def addsong():
+        print("These are the MP3 tags: \n")
+        pprint.pprint(tags)
+        
+        # using ["N/A"] incase the tag does not exist, this will probably be where
+        # the music brainz API will come in, but FILE SCANNER IS DONE
+        print(f"Title: {tags.get('title', ['N/A'])[0]}")
+        print(f"Artist: {tags.get('artist', ['N/A'])[0]}")
+        min = (audio.info.length) // 60
+        secs = round(audio.info.length, ndigits= None) % 60
+        print(f"{min} and {secs}")
+        print(f"Length: {min}:{secs}")
+        print(f"BPM: {tags.get('bpm', ['N/A'])[0]}")
+        print(f"Date: {tags.get('date', ['N/A'])[0]}")
+            
+       
+kobra = Kobraslib()
+kobra.KobraGUI()
+kobra.filescanner()
+
+
+def addsong():
         pass
     
         
@@ -114,23 +133,6 @@ class Kobraslib():
 
 
 
-
-
-
-prefix = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples\\" #for simplicity purposes
-
-
-#pulling from a file and displaying the tags
-
-mp3_file = EasyID3(prefix + 'Molotov.mp3')
-print("MP3 Tags:")
-pprint.pprint(mp3_file) #this is to have the files print out nice 
-
-
-
-# Access specific tags:
-print(f"Title: {mp3_file['title']}")
-print(f"Artist: {mp3_file['artist']}")
 
 
 
@@ -153,4 +155,23 @@ def hi():
     for file in music_files:
         print(file)
     print(music_files)
+    
+        
+
+    prefix = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples\\" #for simplicity purposes
+
+
+    #pulling from a file and displaying the tags
+
+    mp3_file = EasyID3(prefix + 'Molotov.mp3')
+    print("MP3 Tags:")
+    pprint.pprint(mp3_file) #this is to have the files print out nice 
+
+
+
+    # Access specific tags:
+    print(f"Title: {mp3_file['title']}")
+    print(f"Artist: {mp3_file['artist']}")
+
+
 
