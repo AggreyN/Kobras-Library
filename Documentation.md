@@ -81,6 +81,12 @@ project, the user won't be able to pull from my directory. So I will probably ch
 path to the music folder of the user or just have them select the path that they want to be 
 pulling from. But I want everything to be showing up on the GUI so idk how that will work.
 
+12/29/29
+
+    Now it is week 2, and its time to work on putting the data into either a csv file using SQLite
+in combination with Python and implement data insertion. Then hopefully, the GUI will display the list
+as a spreadsheet. Also just worked on adding a command to one of the buttons in the GUI 
+
 
 
 
