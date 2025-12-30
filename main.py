@@ -38,7 +38,10 @@ class Kobraslib():
         """
         self.display = display
         self.file = file
-        self.musicdict = {}
+        self.musicdict = {} 
+    
+    def fs():
+        return Kobraslib.filescanner()
     def KobraGUI(display):
         """
         This will display the window, which is the basis of how this whole thing will work
@@ -48,9 +51,9 @@ class Kobraslib():
         
         display.geometry("500x550") #setting up dimentions
         display.title("Kobras Library")
-        display.configure(bg="navy blue") 
+        display.configure(bg = "#834333") 
 
-        label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22))#creating a simple label for testing
+        label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22), bg = "#967969")#creating a simple label for testing
         label.pack(padx=40, pady= 20)
         # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
         
@@ -61,14 +64,14 @@ class Kobraslib():
         
         #this frame will have all the buttons in order to work the library 
         
-        dpframe = tk.Frame(display, bg="blue", height = 100, padx = 20, pady = 40)
+        dpframe = tk.Frame(display, bg="#967969", height = 100, padx = 20, pady = 40)
         dpframe.pack(side = "top", fill = "y")
 
         dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
-
-        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20)
+        
+        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20, command = Kobraslib.fs)
         dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20)
-        dpfbutton3 = tk.Button(dpframe, text = "Delete  Song", font = ('Helvetica', 18), width = 20)
+        dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 18), width = 20)
         dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
 
         dpfbutton1.pack(pady = 5)
@@ -91,7 +94,7 @@ class Kobraslib():
         
         return display #used so that I can use the info from it within other stuff
     
-    def filescanner(display):
+    def filescanner():
         music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
 
         kbfile = filedialog.askopenfilename(initialdir = music_folder, filetypes = [("Music", "*.mp3")])
@@ -104,24 +107,22 @@ class Kobraslib():
         audio = MP3(kbfile)
         tags = EasyID3(kbfile)
 
-        print("These are the MP3 tags: \n")
-        pprint.pprint(tags)
-        
+        print("These are the MP3 tags: \n")        
         # using ["N/A"] incase the tag does not exist, this will probably be where
         # the music brainz API will come in, but FILE SCANNER IS DONE
         print(f"Title: {tags.get('title', ['N/A'])[0]}")
         print(f"Artist: {tags.get('artist', ['N/A'])[0]}")
-        min = (audio.info.length) // 60
+        min = int((audio.info.length) // 60)
         secs = round(audio.info.length, ndigits= None) % 60
-        print(f"{min} and {secs}")
         print(f"Length: {min}:{secs}")
         print(f"BPM: {tags.get('bpm', ['N/A'])[0]}")
         print(f"Date: {tags.get('date', ['N/A'])[0]}")
+        
+        return kbfile
             
        
 kobra = Kobraslib()
 kobra.KobraGUI()
-kobra.filescanner()
 
 
 def addsong():
