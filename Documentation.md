@@ -85,7 +85,32 @@ pulling from. But I want everything to be showing up on the GUI so idk how that 
 
     Now it is week 2, and its time to work on putting the data into either a csv file using SQLite
 in combination with Python and implement data insertion. Then hopefully, the GUI will display the list
-as a spreadsheet. Also just worked on adding a command to one of the buttons in the GUI 
+as a spreadsheet. Also just worked on adding a command to one of the buttons in the GUI. 
+
+I just implemented the command for "add new song," but now i need to create another GUI based off the SQL
+database that I am going to create. So for example when someone presses add new song, it will open up another
+database GUI from there, while hiding the main "Starting Screen". Then from there they shuould press an "add"
+song button that I will create that will then open up file scanner (will probably be named file selector),
+and then you would select a song that will then automatically update the database GUI with the new song.
+
+* maybe I will add a play song function that will act as a button when you select a song using viewlibrary().
+
+
+
+
+
+
+
+
+References
+
+
+Tkinter Beginner Course - Python GUI Development
+    - https://www.youtube.com/watch?v=ibf5cx221hk
+
+SQLite Tutorial Video
+    - https://www.youtube.com/playlist?list=PLP9IO4UYNF0UQkBXlTMSw0CYsxv-GDkkI
+    s
 
 
 
