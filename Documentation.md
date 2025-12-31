@@ -96,6 +96,13 @@ and then you would select a song that will then automatically update the databas
 * maybe I will add a play song function that will act as a button when you select a song using viewlibrary().
 
 
+12/31/25
+
+    Today I will experiment with Database(db) Testing as well as practicing db manipulation.
+So I will complete the tutorial from the sqlite3 documentation on the Python website. Hopefully
+this will help me learn what is necessary for my code to work. Wish me Luck!
+
+
 
 
 
