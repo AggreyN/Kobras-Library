@@ -120,5 +120,10 @@ SQLite Tutorial Video
     s
 
 
+sqlite3 — DB-API 2.0 interface for SQLite databases
+    - https://docs.python.org/3/library/sqlite3.html#sqlite3-tutorial
+
+Python's IceCream Package: Effortless Debugging with Minimal Code
+    - https://dev.to/0xog_pg/pythons-icecream-package-effortless-debugging-with-minimal-code-45fb
 
 
