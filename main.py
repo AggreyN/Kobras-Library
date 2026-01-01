@@ -3,7 +3,6 @@ from mutagen.easyid3 import EasyID3 # used to read mp3 metadata
 from mutagen.easymp4 import EasyMP4 # 
 from mutagen import File # used to read different file types
 
-import pandas as pd 
 import numpy as np 
 import os # lets me interact with the operating system
 
@@ -12,8 +11,11 @@ import importlib # used to import modules in runtime
 import glob
 import pprint
 
-import tkinter as tk
-from tkinter import filedialog
+import tkinter as tk # for my GUI
+from tkinter import filedialog # for the open file thing
+
+import sqlite3  #used for my databases
+
 
 class Kobraslib():
     """
@@ -46,12 +48,15 @@ class Kobraslib():
         """
         This will display the window, which is the basis of how this whole thing will work
         There will be a menu in which you can select add files to a viewable list. 
+        
+        Side Effects:
+            Will display the main GUI which is basically the front end of all the code.
         """
         display = tk.Tk() #this will create the display basically
         
         display.geometry("500x550") #setting up dimentions
         display.title("Kobras Library")
-        display.configure(bg = "#834333") 
+        display.configure(bg = "#976532") 
 
         label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22), bg = "#967969")#creating a simple label for testing
         label.pack(padx=40, pady= 20)
@@ -80,7 +85,7 @@ class Kobraslib():
         dpfbutton4.pack(pady = 5)
         
         menubar = tk.Menu(display)
-        
+
         display.config(menu=menubar)
 
         # Create File menu
@@ -93,11 +98,18 @@ class Kobraslib():
         display.mainloop() #this makes the display continue consistently Im pretty sure
         
         return display #used so that I can use the info from it within other stuff
-    
     def filescanner():
-        music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
+        """
+        Docstring for filescanner
+        
+            This function opens up the file explorer on a users computer and allows
+        them to add a song to the Kobra database. 
+        
+        Returns:
+            Will return "No file selected" if the window was closed without picking a file.
+        """
 
-        kbfile = filedialog.askopenfilename(initialdir = music_folder, filetypes = [("Music", "*.mp3")])
+        kbfile = filedialog.askopenfilename(filetypes = [("Music", "*.mp3")])
         kbfile
         
         if not kbfile:          #used if the user does not select a file
@@ -110,37 +122,42 @@ class Kobraslib():
         print("These are the MP3 tags: \n")        
         # using ["N/A"] incase the tag does not exist, this will probably be where
         # the music brainz API will come in, but FILE SCANNER IS DONE
-        print(f"Title: {tags.get('title', ['N/A'])[0]}")
-        print(f"Artist: {tags.get('artist', ['N/A'])[0]}")
+        title = tags.get('title', ['N/A'])[0]
+        artist = tags.get('artist', ['N/A'])[0]
         min = int((audio.info.length) // 60)
-        secs = round(audio.info.length, ndigits= None) % 60
-        print(f"Length: {min}:{secs}")
-        print(f"BPM: {tags.get('bpm', ['N/A'])[0]}")
-        print(f"Date: {tags.get('date', ['N/A'])[0]}")
+        secs = int(audio.info.length % 60)
+        lstr = str(f'{min}:{secs}')
+        
+        rawbpm = tags.get('bpm')  # returns None or ['120']
+
+        if rawbpm:
+            bpm = int(float(rawbpm[0]))  # removes trailing .0
+        else:
+            bpm = "N/A"
+
+        date = tags.get('date', ['N/A'])[0]
+        
+        print(f"Title: {title}")
+        print(f"Artist: {artist}")
+        print(f"Length: {lstr}")
+        print(f"BPM: {bpm}")
+        print(f"Date: {date}")
+        
+        musicdict = {"Title": title,
+                     "Artist": artist,
+                     "Length": lstr,
+                     "BPM": bpm,
+                     "Date": date}
+        print(musicdict)
         
         return kbfile
-            
+       
+
+
        
 kobra = Kobraslib()
 kobra.KobraGUI()
-
-
-def addsong():
-        pass
     
-        
-
-
-
-
-
-
-
-
-
-
-
-
 def hi():
     music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
     music_files = []
@@ -174,5 +191,68 @@ def hi():
     print(f"Title: {mp3_file['title']}")
     print(f"Artist: {mp3_file['artist']}")
 
+# after watching a youtube video, I think that it is easier to run things 
+# through functions for sql.
+
+def get_con(dbname):
+    """
+    Docstring for get_con
+    
+    This will act as a basis for establishing a connection to the database.
+    
+    Args:
+        dbname (str): This is the name of the database that will be created, it will
+        probably be "kblib". 
+    Returns:
+         sqlite3.connect(dbname) (str) - Returning the info from the connection
+    Raises:
+        Whatever error that comes from when something wrong is put into the parameter
+        ofr get_con()
+    """
+    try:
+        return sqlite3.connect(dbname) # practice for data bases, this connects to the db and creates on if not made
+    except Exception as e:
+        print(f"Error: {e}") # if a number ot something is put in here, this just raises an exception for it
+        raise
+
+def create_table (connection):
+    """
+    Args:
+        Connection (str): The connection to the database
+    Side Effects:
+        Creates the table that I need 
+    Query - A query is a request for data stored in a data 
+    """
+    query = """
+    CREATE TABLE IF NOT EXISTS kobraslib (
+        id INTEGER PRIMARY KEY,
+        title TEXT NOT NULL,
+        artist TEXT,
+        length INTEGER,
+        bPM INTEGER,
+        genre TEXT,
+        key TEXT)               
+    """
+    try:
+        with connection:
+            connection.execute(query)     #actually runs the code
+        print("Table was created!")
+    except Exception as e:
+        print(e)           #simply just prints the error that arises
+            
 
 
+def main():
+    """
+    Docstring for main
+    
+    Used to run the code for kblib database
+    """
+    connection = get_con("tutorial.db")
+    create_table(connection)
+
+
+
+if __name__ == "__main__":
+    pass
+    
