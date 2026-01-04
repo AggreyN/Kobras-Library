@@ -11,8 +11,13 @@ import importlib # used to import modules in runtime
 import glob
 import pprint
 
+import icecream
+from icecream import ic as print
+
+
 import tkinter as tk # for my GUI
 from tkinter import filedialog # for the open file thing
+from tkinter import ttk   #for my tree view display
 
 import sqlite3  #used for my databases
 
@@ -30,7 +35,7 @@ class Kobraslib():
     Attributes:
         Folderfile(str): the folder in which we will be pulling from (as of rn) for code
     """
-    def __init__(self, display = None, file = None ):
+    def __init__(self, display = None, file = None):
         """
         Initializes Kobraslib with display and filepath.
         Uses tkinter to make a GUI for the library menu.
@@ -40,11 +45,19 @@ class Kobraslib():
         """
         self.display = display
         self.file = file
-        self.musicdict = {} 
+        self.musicdict = [] 
     
-    def fs():
-        return Kobraslib.filescanner()
-    def KobraGUI(display):
+    def fs(self):
+        """
+        Docstring for fs
+        
+        :param self: Description
+        :returns the filescanner function and the information from it
+        :rtype: Any | Literal['No file selected']
+        """
+        return self.filescanner()
+        
+    def KobraGUI(self):
         """
         This will display the window, which is the basis of how this whole thing will work
         There will be a menu in which you can select add files to a viewable list. 
@@ -54,7 +67,7 @@ class Kobraslib():
         """
         display = tk.Tk() #this will create the display basically
         
-        display.geometry("500x550") #setting up dimentions
+        display.geometry("700x750") #setting up dimentions
         display.title("Kobras Library")
         display.configure(bg = "#976532") 
 
@@ -74,8 +87,8 @@ class Kobraslib():
 
         dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
         
-        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20, command = Kobraslib.fs)
-        dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20)
+        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20, command = self.fs)
+        dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20, command = self.viewall)
         dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 18), width = 20)
         dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
 
@@ -91,6 +104,37 @@ class Kobraslib():
         # Create File menu
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
+        
+        
+        
+        #setting up treeview in order to see the 
+        dbtree = ttk.Treeview(display)
+        lsmd = self.musicdict
+        
+        #creating 
+        dbtree["columns"] = (self.musicdict["Title"], lsmd[1], lsmd[2], lsmd[3], lsmd[4])
+        
+        #faormatting columns
+        dbtree.column("#0", width = 40, minwidth = 25)
+        dbtree.column(lsmd[1], anchor = "center", wdith = 120)
+        dbtree.column(lsmd[2], anchor ="E", wdith = 80)
+        dbtree.column(lsmd[3], anchor ="e", wdith = 30)
+        dbtree.column(lsmd[4], anchor ="e", wdith = 50)
+        dbtree.column(lsmd[5], anchor ="e", wdith = 50)
+        
+        # making headings
+        
+        dbtree.heading("#0", text = "Index", anchor = "E")
+       
+        dbtree.heading(lsmd[1], text = "Title", anchor = "center")
+        dbtree.heading(lsmd[2], text = "Artist", anchor = "e")
+        dbtree.heading(lsmd[3], text = "Length", anchor = "e")
+        dbtree.heading(lsmd[4], text = "BPM", anchor = "e")
+        dbtree.heading(lsmd[5], text = "Genre", anchor = "e")
+        dbtree.heading(lsmd[6], text = "Key", anchor = "e" )
+        
+        # Add data
+        dbtree.pack(pady= 20)
 
 
 
@@ -98,7 +142,7 @@ class Kobraslib():
         display.mainloop() #this makes the display continue consistently Im pretty sure
         
         return display #used so that I can use the info from it within other stuff
-    def filescanner():
+    def filescanner(self):
         """
         Docstring for filescanner
         
@@ -108,16 +152,17 @@ class Kobraslib():
         Returns:
             Will return "No file selected" if the window was closed without picking a file.
         """
-
-        kbfile = filedialog.askopenfilename(filetypes = [("Music", "*.mp3")])
-        kbfile
         
-        if not kbfile:          #used if the user does not select a file
+
+        self.kbfile = filedialog.askopenfilename(filetypes = [("Music", "*.mp3")])
+        self.kbfile
+        
+        if not self.kbfile:          #used if the user does not select a file
             print("No File selected.")
             return 
         
-        audio = MP3(kbfile)
-        tags = EasyID3(kbfile)
+        audio = MP3(self.kbfile)
+        tags = EasyID3(self.kbfile)
 
         print("These are the MP3 tags: \n")        
         # using ["N/A"] incase the tag does not exist, this will probably be where
@@ -143,20 +188,92 @@ class Kobraslib():
         print(f"BPM: {bpm}")
         print(f"Date: {date}")
         
-        musicdict = {"Title": title,
+        musicdict = {"Title": title,    # creating a dict that will be used to iterate into the db
                      "Artist": artist,
                      "Length": lstr,
                      "BPM": bpm,
                      "Date": date}
-        print(musicdict)
         
-        return kbfile
-       
+        
+        
+        self.musicdict = musicdict
+        connection = get_con("tutorial.db")
+    
+        
+        connection = get_con("tutorial.db")
+        try:
+            #creation of table
+            create_table(connection)
+            self.insertsong(connection, musicdict["Title"], musicdict["Artist"], musicdict["Length"], musicdict["BPM"], kobra.musicdict["Date"])
+            
+            return musicdict
+        finally:
+            connection.close()  #for saftey reasons always want to close
+        
+    def insertsong(self, connection, title, artist, length, bpm, Date):
+        """
+        Docstring for insertsong
+        Args:
+            connection: Description
+            title (str): The song title
+            artist (str): The artist title
+            length (str): The song length
+            bpm (str): The song beats per minute
+            Date (str): The song length
+        Side Effects:
+
+        """
+        query = "INSERT INTO kobraslib (title, artist, length, bpm, Date) VALUES (?,?,?,?,?)"
+        
+        # inputing the values into the list
+        try:
+            with connection:
+                connection.execute(query, (title, artist, length, bpm, Date))
+            print(f"The song {kobra.musicdict["Title"]} was added")
+        except Exception as e:
+            print("Error: You Already Have This Song Added, Input Another Song")
+    
+    def viewall(self, connection = None, condition = None):
+        """
+        Args:
+            Connection(str): The connection to the db
+            Condition: this will be if someone picke like genre or something
+            
+        """
+        connection = get_con("tutorial.db")
+        
+        query = "SELECT * FROM kobraslib"
+        if condition:  #this will be where people will request the organizaion
+            query += f"WHERE {condition}"
+        
+        try:
+            with connection:
+                rows = connection.execute(query).fetchall() #this will print everything within the query
+            return rows
+        except Exception as e:
+            print(e)
+        for song in self.viewall(connection):     #recursive
+            print(song)
+            
+        connection.close()
+      
+        
+            
+
+        
+        
 
 
-       
-kobra = Kobraslib()
-kobra.KobraGUI()
+
+
+
+
+
+
+    
+    
+    
+
     
 def hi():
     music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
@@ -229,10 +346,13 @@ def create_table (connection):
         title TEXT NOT NULL,
         artist TEXT,
         length INTEGER,
-        bPM INTEGER,
+        bpm TEXT,
+        Date INTEGER,
         genre TEXT,
-        key TEXT)               
+        key TEXT,
+        UNIQUE(title, artist))               
     """
+    
     try:
         with connection:
             connection.execute(query)     #actually runs the code
@@ -249,10 +369,20 @@ def main():
     Used to run the code for kblib database
     """
     connection = get_con("tutorial.db")
-    create_table(connection)
+    
+    try:
+        #creation of table
+        create_table(connection)
+        insertsong(connection, kobra.musicdict["Title"], kobra.musicdict["Artist"], kobra.musicdict["Length"], kobra.musicdict["BPM"], kobra.musicdict["Date"])
+        cur = connection.cursor()
+        
+    finally:
+        connection.close()  #for saftey reasons always want to close
 
 
 
 if __name__ == "__main__":
-    pass
-    
+       
+    kobra = Kobraslib()
+    kobra.KobraGUI()
+
