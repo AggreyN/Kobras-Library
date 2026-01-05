@@ -70,24 +70,24 @@ class Kobraslib():
             It returns the display information
         
         """
-        display = tk.Tk() #this will create the display basically
+        self.display = tk.Tk() #this will create the display basically
         
-        display.geometry("800x750") #setting up dimentions
-        display.title("Kobras Library")
-        display.configure(bg = "#976532") 
+        self.display.geometry("800x750") #setting up dimentions
+        self.display.title("Kobras Library")
+        self.display.configure(bg = "#976532") 
 
-        label = tk.Label(display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22), bg = "#967969")#creating a simple label for testing
+        label = tk.Label(self.display, text = "Welcome to Kobra's Library!!", font = ('Helvetica', 22), bg = "#967969")#creating a simple label for testing
         label.pack(padx=40, pady= 20)
         # the pack func tells python where to put the code, and the pads tell how far from the borders you want it.
         
-        textbox = tk.Text(display, height = 3, font = ('Helvetica', 15)) #a textbox
+        textbox = tk.Text(self.display, height = 3, font = ('Helvetica', 15)) #a textbox
         
         
-        button = tk.Button(display, text = "Click for Menu!", font = ('Helvetica', 20))
+        button = tk.Button(self.display, text = "Click for Menu!", font = ('Helvetica', 20))
         
         #this frame will have all the buttons in order to work the library 
         
-        dpframe = tk.Frame(display, bg="#967969", height = 100, padx = 20, pady = 40)
+        dpframe = tk.Frame(self.display, bg="#967969", height = 100, padx = 20, pady = 40)
         dpframe.pack(side = "top", fill = "y")
 
         dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
@@ -107,7 +107,7 @@ class Kobraslib():
         
         
         #setting up treeview in order to see the 
-        dbtree = ttk.Treeview(display)
+        dbtree = ttk.Treeview(self.display)
         lsmd = self.musicdict
         
         #creating 
@@ -117,7 +117,7 @@ class Kobraslib():
         #faormatting columns
         dbtree.column("#0", width = 60, minwidth = 25)
         dbtree.column(columns[0], anchor = "center", width = 280)
-        dbtree.column(columns[1], anchor ="center", width = 100)
+        dbtree.column(columns[1], anchor ="center", width = 130)
         dbtree.column(columns[2], anchor ="center", width = 70)
         dbtree.column(columns[3], anchor ="center", width = 70)
         dbtree.column(columns[4], anchor ="center", width = 50)
@@ -136,15 +136,33 @@ class Kobraslib():
         dbtree.heading(columns[5], text = "Genre", anchor = "center")
         dbtree.heading(columns[6], text = "Key", anchor = "center" )
         
-        # Add data
+        # Add data with a for loop
+        
+        connection = get_con("tutorial.db")
+
+        query = "SELECT title, artist, length, bpm, Date FROM kobraslib"
+
+        rows = connection.execute(query).fetchall()
+        muse = 0
+
+        for row in rows:
+            dbtree.insert(parent = "", index ='end', iid = muse, text = "ID", values = row)
+            muse += 1
+
+        connection.close()
+                
+        
+        
         dbtree.pack(pady= 20)
 
 
 
         
-        display.mainloop() #this makes the display continue consistently Im pretty sure
+        self.display.mainloop() #this makes the display continue consistently Im pretty sure
         
-        return display #used so that I can use the info from it within other stuff
+        return self.display #used so that I can use the info from it within other stuff
+
+
     def popup(self, num, message):
         """
         Docstring for popup
@@ -193,6 +211,8 @@ class Kobraslib():
         artist = tags.get('artist', ['N/A'])[0]
         min = int((audio.info.length) // 60)
         secs = int(audio.info.length % 60)
+        if len(str(secs)) == 1:
+            secs = f'0{str(secs)}'
         lstr = str(f'{min}:{secs}')
         
         rawbpm = tags.get('bpm')  # returns None or ['120']
@@ -255,7 +275,7 @@ class Kobraslib():
                 message = "You already put this song in the database. \nPlease input a different song!"
                 self.popup(num, message) #pop up code
     
-    def viewall(self, connection = None, condition = None):
+    def viewall(self, connection= None, condition = None ):
         """
         Args:
             Connection(str): The connection to the db
