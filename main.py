@@ -18,6 +18,7 @@ from icecream import ic as print
 import tkinter as tk # for my GUI
 from tkinter import filedialog # for the open file thing
 from tkinter import ttk   #for my tree view display
+from tkinter import messagebox #for the alerts or messages that might pop up
 
 import sqlite3  #used for my databases
 
@@ -62,12 +63,16 @@ class Kobraslib():
         This will display the window, which is the basis of how this whole thing will work
         There will be a menu in which you can select add files to a viewable list. 
         
+        
         Side Effects:
             Will display the main GUI which is basically the front end of all the code.
+        Returns:
+            It returns the display information
+        
         """
         display = tk.Tk() #this will create the display basically
         
-        display.geometry("700x750") #setting up dimentions
+        display.geometry("800x750") #setting up dimentions
         display.title("Kobras Library")
         display.configure(bg = "#976532") 
 
@@ -87,6 +92,7 @@ class Kobraslib():
 
         dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
         
+        #these are the bottons which each has a command that connects to a function with a specific purpose.
         dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20, command = self.fs)
         dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20, command = self.viewall)
         dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 18), width = 20)
@@ -97,14 +103,7 @@ class Kobraslib():
         dpfbutton3.pack(pady = 5)
         dpfbutton4.pack(pady = 5)
         
-        menubar = tk.Menu(display)
 
-        display.config(menu=menubar)
-
-        # Create File menu
-        file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="File", menu=file_menu)
-        
         
         
         #setting up treeview in order to see the 
@@ -112,26 +111,30 @@ class Kobraslib():
         lsmd = self.musicdict
         
         #creating 
-        dbtree["columns"] = (self.musicdict["Title"], lsmd[1], lsmd[2], lsmd[3], lsmd[4])
+        columns = ("Title", "Artist", "Length", "BPM", "Date", "Genre", "Key")
+        dbtree["columns"] = columns
         
         #faormatting columns
-        dbtree.column("#0", width = 40, minwidth = 25)
-        dbtree.column(lsmd[1], anchor = "center", wdith = 120)
-        dbtree.column(lsmd[2], anchor ="E", wdith = 80)
-        dbtree.column(lsmd[3], anchor ="e", wdith = 30)
-        dbtree.column(lsmd[4], anchor ="e", wdith = 50)
-        dbtree.column(lsmd[5], anchor ="e", wdith = 50)
-        
+        dbtree.column("#0", width = 60, minwidth = 25)
+        dbtree.column(columns[0], anchor = "center", width = 280)
+        dbtree.column(columns[1], anchor ="center", width = 100)
+        dbtree.column(columns[2], anchor ="center", width = 70)
+        dbtree.column(columns[3], anchor ="center", width = 70)
+        dbtree.column(columns[4], anchor ="center", width = 50)
+        dbtree.column(columns[5], anchor ="center", width = 100)
+        dbtree.column(columns[6], anchor ="center", width = 50)
+
         # making headings
         
-        dbtree.heading("#0", text = "Index", anchor = "E")
+        dbtree.heading("#0", text = "Index", anchor = "center")
        
-        dbtree.heading(lsmd[1], text = "Title", anchor = "center")
-        dbtree.heading(lsmd[2], text = "Artist", anchor = "e")
-        dbtree.heading(lsmd[3], text = "Length", anchor = "e")
-        dbtree.heading(lsmd[4], text = "BPM", anchor = "e")
-        dbtree.heading(lsmd[5], text = "Genre", anchor = "e")
-        dbtree.heading(lsmd[6], text = "Key", anchor = "e" )
+        dbtree.heading(columns[0], text = "Title", anchor = "center")
+        dbtree.heading(columns[1], text = "Artist", anchor = "center")
+        dbtree.heading(columns[2], text = "Length", anchor = "center")
+        dbtree.heading(columns[3], text = "BPM", anchor = "center")
+        dbtree.heading(columns[4], text = "Date", anchor = "center")
+        dbtree.heading(columns[5], text = "Genre", anchor = "center")
+        dbtree.heading(columns[6], text = "Key", anchor = "center" )
         
         # Add data
         dbtree.pack(pady= 20)
@@ -142,6 +145,25 @@ class Kobraslib():
         display.mainloop() #this makes the display continue consistently Im pretty sure
         
         return display #used so that I can use the info from it within other stuff
+    def popup(self, num, message):
+        """
+        Docstring for popup
+        
+            This will be used as a pop up anytime someone has successfully added a song, 
+        there's an error, or any other type of message. 
+        
+        These are all the types of pop ups:
+        
+        showinfo()
+        showwarning()
+        showerror()
+        showquestion()
+        """
+        if num == 1:
+            messagebox.showinfo("Hello!", message)   # ~.showinfo("title", "message")
+        elif num == 2:
+            messagebox.showerror("Error!!!", message)
+        
     def filescanner(self):
         """
         Docstring for filescanner
@@ -181,12 +203,6 @@ class Kobraslib():
             bpm = "N/A"
 
         date = tags.get('date', ['N/A'])[0]
-        
-        print(f"Title: {title}")
-        print(f"Artist: {artist}")
-        print(f"Length: {lstr}")
-        print(f"BPM: {bpm}")
-        print(f"Date: {date}")
         
         musicdict = {"Title": title,    # creating a dict that will be used to iterate into the db
                      "Artist": artist,
@@ -229,9 +245,15 @@ class Kobraslib():
         try:
             with connection:
                 connection.execute(query, (title, artist, length, bpm, Date))
-            print(f"The song {kobra.musicdict["Title"]} was added")
+            if "hi" =="hi":
+                num = 1
+                message = (f"The song {kobra.musicdict["Title"]} was added!")
+                self.popup(num, message)    #pop up code
         except Exception as e:
-            print("Error: You Already Have This Song Added, Input Another Song")
+            if "hi" == "hi":     
+                num = 2
+                message = "You already put this song in the database. \nPlease input a different song!"
+                self.popup(num, message) #pop up code
     
     def viewall(self, connection = None, condition = None):
         """
@@ -252,7 +274,8 @@ class Kobraslib():
             return rows
         except Exception as e:
             print(e)
-        for song in self.viewall(connection):     #recursive
+        
+        for song in connection:     #recursive
             print(song)
             
         connection.close()
@@ -307,6 +330,13 @@ def hi():
     # Access specific tags:
     print(f"Title: {mp3_file['title']}")
     print(f"Artist: {mp3_file['artist']}")
+    
+    print(f"Title: {title}")
+    print(f"Artist: {artist}")
+    print(f"Length: {lstr}")
+    print(f"BPM: {bpm}")
+    print(f"Date: {date}")
+        
 
 # after watching a youtube video, I think that it is easier to run things 
 # through functions for sql.
