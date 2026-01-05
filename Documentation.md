@@ -100,7 +100,35 @@ and then you would select a song that will then automatically update the databas
 
     Today I will experiment with Database(db) Testing as well as practicing db manipulation.
 So I will complete the tutorial from the sqlite3 documentation on the Python website. Hopefully
-this will help me learn what is necessary for my code to work. Wish me Luck!
+this will help me learn what is necessary for my code to work. Wish me Luck! Happy New Years Eve bte.
+
+PSA: The database set up is heavily based off the code from Code With Josh's Video, with the combination of 
+my own knowledge and other online sources. 
+
+
+
+1/1/26
+
+    Currently working on dealing with dupicates
+
+1/4/25
+
+    Don't worry I have worked on the project in the time that has passed I just haven't written anything yet. But this is what has been done.
+
+    - Database addition with message popping up during mainloop
+    - Progress on deletion of data
+    - Adding a treeview widget in order for the data to be seen on the interface
+    - Research on using spotipy for API usage 
+    - implementation of the SQL based functions within the Kobraslib Class
+    - adding object functions? (idk what its called but adding the "self." thing) to variables for cross functional use
+    - File testing and Duplicate hadling
+    - Implemnting Data Insertion
+
+    What I am currently working on:
+
+    - I want everything the user does to be done on the interface so I am making the messages pop up, whether its a printed message, an error, or anything else, it should pop up on KobrasGUI.
+    - Data insertion from the kobraslib db into the treeview
+    - SQL deletion
 
 
 
@@ -108,8 +136,7 @@ this will help me learn what is necessary for my code to work. Wish me Luck!
 
 
 
-
-References
+_References_
 
 
 Tkinter Beginner Course - Python GUI Development
@@ -126,4 +153,7 @@ sqlite3 — DB-API 2.0 interface for SQLite databases
 Python's IceCream Package: Effortless Debugging with Minimal Code
     - https://dev.to/0xog_pg/pythons-icecream-package-effortless-debugging-with-minimal-code-45fb
 
+Using Databases With TKinter - Python Tkinter GUI Tutorial #19
+    - https://www.youtube.com/watch?v=YR3h2CY21-U
+    
 
