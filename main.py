@@ -9,7 +9,6 @@ import os # lets me interact with the operating system
 import sys 
 import importlib # used to import modules in runtime
 import glob
-import pprint
 
 import icecream
 from icecream import ic as print
@@ -21,6 +20,10 @@ from tkinter import ttk   #for my tree view display
 from tkinter import messagebox #for the alerts or messages that might pop up
 
 import sqlite3  #used for my databases
+
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials # in order for my code to talk to spotify
+
 
 
 class Kobraslib():
@@ -36,7 +39,7 @@ class Kobraslib():
     Attributes:
         Folderfile(str): the folder in which we will be pulling from (as of rn) for code
     """
-    def __init__(self, display = None, file = None):
+    def __init__(self, display = None, ):
         """
         Initializes Kobraslib with display and filepath.
         Uses tkinter to make a GUI for the library menu.
@@ -45,7 +48,6 @@ class Kobraslib():
             file (str): The path to the music file.
         """
         self.display = display
-        self.file = file
         self.musicdict = [] 
     
     def fs(self):
@@ -72,7 +74,7 @@ class Kobraslib():
         """
         self.display = tk.Tk() #this will create the display basically
         
-        self.display.geometry("800x750") #setting up dimentions
+        self.display.geometry("1000x550") #setting up dimentions
         self.display.title("Kobras Library")
         self.display.configure(bg = "#976532") 
 
@@ -84,31 +86,31 @@ class Kobraslib():
         
         
         button = tk.Button(self.display, text = "Click for Menu!", font = ('Helvetica', 20))
-        
-        #this frame will have all the buttons in order to work the library 
-        
-        dpframe = tk.Frame(self.display, bg="#967969", height = 100, padx = 20, pady = 40)
-        dpframe.pack(side = "top", fill = "y")
 
-        dpflabel = tk.Label(dpframe, text= "Menu", font = ('Helvetica', 30)).pack(pady = 10, side = "top")
+       #setting up treeview in order to see the         
         
-        #these are the bottons which each has a command that connects to a function with a specific purpose.
-        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 18), width = 20, command = self.fs)
-        dpfbutton2 = tk.Button(dpframe, text = "View Library", font = ('Helvetica', 18), width = 20, command = self.viewall)
-        dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 18), width = 20)
-        dpfbutton4 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 18), width = 20)
-
-        dpfbutton1.pack(pady = 5)
-        dpfbutton2.pack(pady = 5)
-        dpfbutton3.pack(pady = 5)
-        dpfbutton4.pack(pady = 5)
+        ## Creating style 
         
-
+        style = ttk.Style()
+        style.theme_use("default")
         
+        # creating colors
         
-        #setting up treeview in order to see the 
-        dbtree = ttk.Treeview(self.display)
-        lsmd = self.musicdict
+        style.configure("Treeview", background = "#D3D3D3", foreground = "black", feildbackground = "#D3D3D3")
+        
+        style.map('Treeview', background = [('selected', "#32778C")])
+        
+        #creating frame
+        dbtreefame = tk.Frame(self.display)
+        dbtreefame.pack(pady = 10, fill = "x")
+        
+        dbtfscrool = tk.Scrollbar (dbtreefame)
+        dbtfscrool.pack(side = "right", fill = "both")
+        
+        #setting up treeview in order to see the d
+        dbtree = ttk.Treeview(dbtreefame, yscrollcommand = dbtfscrool.set, selectmode = "extended") 
+        
+        dbtfscrool.config(command = dbtree.yview)
         
         #creating 
         columns = ("Title", "Artist", "Length", "BPM", "Date", "Genre", "Key")
@@ -116,8 +118,8 @@ class Kobraslib():
         
         #faormatting columns
         dbtree.column("#0", width = 60, minwidth = 25)
-        dbtree.column(columns[0], anchor = "center", width = 280)
-        dbtree.column(columns[1], anchor ="center", width = 130)
+        dbtree.column(columns[0], anchor = "center", width = 300)
+        dbtree.column(columns[1], anchor ="center", width = 270)
         dbtree.column(columns[2], anchor ="center", width = 70)
         dbtree.column(columns[3], anchor ="center", width = 70)
         dbtree.column(columns[4], anchor ="center", width = 50)
@@ -136,6 +138,12 @@ class Kobraslib():
         dbtree.heading(columns[5], text = "Genre", anchor = "center")
         dbtree.heading(columns[6], text = "Key", anchor = "center" )
         
+        
+        # striped rows
+        
+        dbtree.tag_configure('oddrow', background = "white")
+        dbtree.tag_configure('evenrow', background = "#E1B57D")
+        
         # Add data with a for loop
         
         connection = get_con("tutorial.db")
@@ -144,18 +152,65 @@ class Kobraslib():
 
         rows = connection.execute(query).fetchall()
         muse = 0
-
+        
+        
         for row in rows:
-            dbtree.insert(parent = "", index ='end', iid = muse, text = "ID", values = row)
+            if muse % 2 == 0:
+                dbtree.insert(
+                    parent="",
+                    index="end",
+                    iid=muse,
+                    text=str(muse),
+                    values=row,
+                    tags=('evenrow',)
+                )
+            else:
+                dbtree.insert(
+                    parent="",
+                    index="end",
+                    iid=muse,
+                    text=str(muse),
+                    values=row,
+                    tags=('oddrow',)
+                )
             muse += 1
+
+        
 
         connection.close()
                 
         
         
-        dbtree.pack(pady= 20)
+        dbtree.pack()
+
+       
+        #this frame will have all the buttons in order to work the library 
+        
+        dpframe = tk.LabelFrame(self.display, bg="#967969", width = 750, padx = 20, pady = 20)
+        dpframe.pack(fill = "x", expand = "yes", padx = 10)
+
+        dpflabel = tk.Label(dpframe, text= "Functions", font = ('Helvetica', 14))
+        dpflabel.grid()        
+        #these are the bottons which each has a command that connects to a function with a specific purpose.
+        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 12, command = self.fs)
+        dpfbutton2 = tk.Button(dpframe, text = "Filter by", font = ('Helvetica', 12), width = 12, command = self.viewall)
+        dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12)
+        dpfbutton4 = tk.Button(dpframe, text = "Delete Multiple Songs", font = ('Helvetica', 12))
+        dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12)
+        
+        
+        dpfbutton1.grid(row = 0, column = 1, padx = 10, pady = 10)
+        dpfbutton2.grid(row = 0, column = 2, padx = 10, pady = 10)
+        dpfbutton3.grid(row = 0, column = 3, padx = 10, pady = 10)
+        dpfbutton4.grid(row = 0, column = 4, padx = 10, pady = 10)
+        dpfbutton5.grid(row = 0, column = 5, padx = 10, pady = 10)
 
 
+        
+
+        
+        
+ 
 
         
         self.display.mainloop() #this makes the display continue consistently Im pretty sure
@@ -267,7 +322,7 @@ class Kobraslib():
                 connection.execute(query, (title, artist, length, bpm, Date))
             if "hi" =="hi":
                 num = 1
-                message = (f"The song {kobra.musicdict["Title"]} was added!")
+                message = (f"The song: '{kobra.musicdict["Title"]}' was added!")
                 self.popup(num, message)    #pop up code
         except Exception as e:
             if "hi" == "hi":     
@@ -299,6 +354,34 @@ class Kobraslib():
             print(song)
             
         connection.close()
+    def create_table (self,connection):
+        """
+        Args:
+            Connection (str): The connection to the database
+        Side Effects:
+            Creates the table that I need 
+        Query - A query is a request for data stored in a data 
+        """
+        query = """
+        CREATE TABLE IF NOT EXISTS kobraslib (
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            artist TEXT,
+            length INTEGER,
+            bpm TEXT,
+            Date INTEGER,
+            genre TEXT,
+            key TEXT,
+            UNIQUE(title, artist))               
+        """
+        
+        try:
+            with connection:
+                connection.execute(query)     #actually runs the code
+            print("Table was created!")
+        except Exception as e:
+            print(e)           #simply just prints the error that arises
+                
       
         
             
