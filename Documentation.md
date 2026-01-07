@@ -131,6 +131,15 @@ my own knowledge and other online sources.
     - SQL deletion
 
 
+1/6/25
+
+    - Data insertion into the treeview is done
+    - I used Librosa for getting the key !! That was way easier than expected now working on genre stuff
+    - I think I will use musicbrainz because spotipy didn't work
+    - chaged the arrangment of buttons and frames
+
+I will now start working on filtering, using the deleting button and the other buttons as well.
+
 
 
 
@@ -155,5 +164,13 @@ Python's IceCream Package: Effortless Debugging with Minimal Code
 
 Using Databases With TKinter - Python Tkinter GUI Tutorial #19
     - https://www.youtube.com/watch?v=YR3h2CY21-U
-    
+
+
+Popup Boxes - Object Oriented Tkinter 2
+    - https://www.youtube.com/watch?v=5ixG5tv5AJQ
+
+librosa.feature.tempo
+    - https://librosa.org/doc/main/generated/librosa.feature.tempo.html
+
+
 
