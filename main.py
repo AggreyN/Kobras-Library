@@ -3,7 +3,12 @@ from mutagen.easyid3 import EasyID3 # used to read mp3 metadata
 from mutagen.easymp4 import EasyMP4 # 
 from mutagen import File # used to read different file types
 
-import numpy as np 
+
+import librosa  # for audio analysis
+import numpy as np
+
+
+
 import os # lets me interact with the operating system
 
 import sys 
@@ -108,47 +113,47 @@ class Kobraslib():
         dbtfscrool.pack(side = "right", fill = "both")
         
         #setting up treeview in order to see the d
-        dbtree = ttk.Treeview(dbtreefame, yscrollcommand = dbtfscrool.set, selectmode = "extended") 
+        self.dbtree = ttk.Treeview(dbtreefame, yscrollcommand = dbtfscrool.set, selectmode = "extended") 
         
-        dbtfscrool.config(command = dbtree.yview)
+        dbtfscrool.config(command = self.dbtree.yview)
         
         #creating 
         columns = ("Title", "Artist", "Length", "BPM", "Date", "Genre", "Key")
-        dbtree["columns"] = columns
+        self.dbtree["columns"] = columns
         
         #faormatting columns
-        dbtree.column("#0", width = 60, minwidth = 25)
-        dbtree.column(columns[0], anchor = "center", width = 300)
-        dbtree.column(columns[1], anchor ="center", width = 270)
-        dbtree.column(columns[2], anchor ="center", width = 70)
-        dbtree.column(columns[3], anchor ="center", width = 70)
-        dbtree.column(columns[4], anchor ="center", width = 50)
-        dbtree.column(columns[5], anchor ="center", width = 100)
-        dbtree.column(columns[6], anchor ="center", width = 50)
+        self.dbtree.column("#0", width = 60, minwidth = 25)
+        self.dbtree.column(columns[0], anchor = "center", width = 300)
+        self.dbtree.column(columns[1], anchor ="center", width = 270)
+        self.dbtree.column(columns[2], anchor ="center", width = 70)
+        self.dbtree.column(columns[3], anchor ="center", width = 70)
+        self.dbtree.column(columns[4], anchor ="center", width = 50)
+        self.dbtree.column(columns[5], anchor ="center", width = 50)
+        self.dbtree.column(columns[6], anchor ="center", width = 100)
 
         # making headings
         
-        dbtree.heading("#0", text = "Index", anchor = "center")
+        self.dbtree.heading("#0", text = "Index", anchor = "center")
        
-        dbtree.heading(columns[0], text = "Title", anchor = "center")
-        dbtree.heading(columns[1], text = "Artist", anchor = "center")
-        dbtree.heading(columns[2], text = "Length", anchor = "center")
-        dbtree.heading(columns[3], text = "BPM", anchor = "center")
-        dbtree.heading(columns[4], text = "Date", anchor = "center")
-        dbtree.heading(columns[5], text = "Genre", anchor = "center")
-        dbtree.heading(columns[6], text = "Key", anchor = "center" )
+        self.dbtree.heading(columns[0], text = "Title", anchor = "center")
+        self.dbtree.heading(columns[1], text = "Artist", anchor = "center")
+        self.dbtree.heading(columns[2], text = "Length", anchor = "center")
+        self.dbtree.heading(columns[3], text = "BPM", anchor = "center")
+        self.dbtree.heading(columns[4], text = "Date", anchor = "center")
+        self.dbtree.heading(columns[5], text = "Key", anchor = "center")
+        self.dbtree.heading(columns[6], text = "Genre", anchor = "center" )
         
         
         # striped rows
         
-        dbtree.tag_configure('oddrow', background = "white")
-        dbtree.tag_configure('evenrow', background = "#E1B57D")
+        self.dbtree.tag_configure('oddrow', background = "white")
+        self.dbtree.tag_configure('evenrow', background = "#E1B57D")
         
         # Add data with a for loop
         
         connection = get_con("tutorial.db")
 
-        query = "SELECT title, artist, length, bpm, Date FROM kobraslib"
+        query = "SELECT title, artist, length, bpm, Date, key FROM kobraslib"
 
         rows = connection.execute(query).fetchall()
         muse = 0
@@ -156,7 +161,7 @@ class Kobraslib():
         
         for row in rows:
             if muse % 2 == 0:
-                dbtree.insert(
+                self.dbtree.insert(
                     parent="",
                     index="end",
                     iid=muse,
@@ -165,7 +170,7 @@ class Kobraslib():
                     tags=('evenrow',)
                 )
             else:
-                dbtree.insert(
+                self.dbtree.insert(
                     parent="",
                     index="end",
                     iid=muse,
@@ -181,7 +186,7 @@ class Kobraslib():
                 
         
         
-        dbtree.pack()
+        self.dbtree.pack()
 
        
         #this frame will have all the buttons in order to work the library 
@@ -197,13 +202,15 @@ class Kobraslib():
         dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12)
         dpfbutton4 = tk.Button(dpframe, text = "Delete Multiple Songs", font = ('Helvetica', 12))
         dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12)
-        
+        dpfbutton6 = tk.Button(dpframe, text="Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
         
         dpfbutton1.grid(row = 0, column = 1, padx = 10, pady = 10)
         dpfbutton2.grid(row = 0, column = 2, padx = 10, pady = 10)
         dpfbutton3.grid(row = 0, column = 3, padx = 10, pady = 10)
         dpfbutton4.grid(row = 0, column = 4, padx = 10, pady = 10)
         dpfbutton5.grid(row = 0, column = 5, padx = 10, pady = 10)
+        dpfbutton6.grid(row=0, column=6, padx=10, pady=10)
+
 
 
         
@@ -217,7 +224,31 @@ class Kobraslib():
         
         return self.display #used so that I can use the info from it within other stuff
 
+    def refresh_treeview(self):
+        # Clear current rows
+        for row in self.dbtree.get_children():
+            self.dbtree.delete(row)
 
+        # Re-query the DB
+        connection = get_con("tutorial.db")
+        query = "SELECT title, artist, length, bpm, Date, key FROM kobraslib"
+
+        rows = connection.execute(query).fetchall()
+        connection.close()
+
+        # Re-insert with alternating tags
+        muse = 0
+        for row in rows:
+            tag = 'evenrow' if muse % 2 == 0 else 'oddrow' # peep the conditional expression
+            self.dbtree.insert(
+                parent="",
+                index="end",
+                iid=muse,
+                text=str(muse),
+                values=row,
+                tags=(tag,)
+            )
+            muse += 1
     def popup(self, num, message):
         """
         Docstring for popup
@@ -271,6 +302,17 @@ class Kobraslib():
         lstr = str(f'{min}:{secs}')
         
         rawbpm = tags.get('bpm')  # returns None or ['120']
+        
+        
+        def detect_key(file):
+            y, sr = librosa.load(file, sr=None)
+            chroma = librosa.feature.chroma_stft(y=y, sr=sr)  # chroma features
+            avg_chroma = np.mean(chroma, axis=1)
+            keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] #list of all possible keys in order
+            detected = keys[np.argmax(avg_chroma)]
+            return detected
+        
+        key = detect_key(self.kbfile)
 
         if rawbpm:
             bpm = int(float(rawbpm[0]))  # removes trailing .0
@@ -283,25 +325,26 @@ class Kobraslib():
                      "Artist": artist,
                      "Length": lstr,
                      "BPM": bpm,
-                     "Date": date}
+                     "Date": date,
+                     "Key": key}
         
         
-        
+
         self.musicdict = musicdict
-        connection = get_con("tutorial.db")
     
         
         connection = get_con("tutorial.db")
         try:
             #creation of table
             create_table(connection)
-            self.insertsong(connection, musicdict["Title"], musicdict["Artist"], musicdict["Length"], musicdict["BPM"], kobra.musicdict["Date"])
-            
+            self.insertsong(connection, musicdict["Title"], musicdict["Artist"], musicdict["Length"], musicdict["BPM"], kobra.musicdict["Date"], kobra.musicdict["Key"])
+            self.refresh_treeview
             return musicdict
         finally:
             connection.close()  #for saftey reasons always want to close
         
-    def insertsong(self, connection, title, artist, length, bpm, Date):
+        
+    def insertsong(self, connection, title, artist, length, bpm, Date, Key):
         """
         Docstring for insertsong
         Args:
@@ -314,16 +357,17 @@ class Kobraslib():
         Side Effects:
 
         """
-        query = "INSERT INTO kobraslib (title, artist, length, bpm, Date) VALUES (?,?,?,?,?)"
+        query = "INSERT INTO kobraslib (title, artist, length, bpm, Date, key) VALUES (?,?,?,?,?,?)"
         
         # inputing the values into the list
         try:
             with connection:
-                connection.execute(query, (title, artist, length, bpm, Date))
+                connection.execute(query, (title, artist, length, bpm, Date, Key))
             if "hi" =="hi":
                 num = 1
                 message = (f"The song: '{kobra.musicdict["Title"]}' was added!")
                 self.popup(num, message)    #pop up code
+
         except Exception as e:
             if "hi" == "hi":     
                 num = 2
@@ -506,12 +550,11 @@ def main():
     try:
         #creation of table
         create_table(connection)
-        insertsong(connection, kobra.musicdict["Title"], kobra.musicdict["Artist"], kobra.musicdict["Length"], kobra.musicdict["BPM"], kobra.musicdict["Date"])
         cur = connection.cursor()
         
     finally:
         connection.close()  #for saftey reasons always want to close
-
+main()
 
 
 if __name__ == "__main__":
