@@ -137,8 +137,16 @@ my own knowledge and other online sources.
     - I used Librosa for getting the key !! That was way easier than expected now working on genre stuff
     - I think I will use musicbrainz because spotipy didn't work
     - chaged the arrangment of buttons and frames
+    - Added color for aesthetics
+
 
 I will now start working on filtering, using the deleting button and the other buttons as well.
+
+1/7/25
+
+     - The deletion button finally works after a lot of debugging
+     - Will probably work on filtering, the genre part, and searching to finish it off.
+    
 
 
 
