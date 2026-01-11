@@ -63,7 +63,8 @@ class Kobraslib():
         :returns the filescanner function and the information from it
         :rtype: Any | Literal['No file selected']
         """
-        return self.filescanner()
+        self.filescanner()
+        self.refresh_treeview()
         
     def KobraGUI(self):
         """
@@ -79,7 +80,7 @@ class Kobraslib():
         """
         self.display = tk.Tk() #this will create the display basically
         
-        self.display.geometry("1000x550") #setting up dimentions
+        self.display.geometry("1200x650") #setting up dimentions
         self.display.title("Kobras Library")
         self.display.configure(bg = "#976532") 
 
@@ -118,13 +119,13 @@ class Kobraslib():
         dbtfscrool.config(command = self.dbtree.yview)
         
         #creating 
-        columns = ("Title", "Artist", "Length", "BPM", "Date", "Genre", "Key")
+        columns = ("Title", "Artist", "Length", "BPM", "Date", "Key", "Genre")
         self.dbtree["columns"] = columns
         
         #faormatting columns
         self.dbtree.column("#0", width = 60, minwidth = 25)
-        self.dbtree.column(columns[0], anchor = "center", width = 300)
-        self.dbtree.column(columns[1], anchor ="center", width = 270)
+        self.dbtree.column(columns[0], anchor = "center", width = 380)
+        self.dbtree.column(columns[1], anchor ="center", width = 300)
         self.dbtree.column(columns[2], anchor ="center", width = 70)
         self.dbtree.column(columns[3], anchor ="center", width = 70)
         self.dbtree.column(columns[4], anchor ="center", width = 50)
@@ -153,7 +154,7 @@ class Kobraslib():
         
         connection = get_con("tutorial.db")
 
-        query = "SELECT title, artist, length, bpm, Date, key FROM kobraslib"
+        query = "SELECT title, artist, length, bpm, Date, key, genre FROM kobraslib"
 
         rows = connection.execute(query).fetchall()
         muse = 0
@@ -197,9 +198,9 @@ class Kobraslib():
         dpflabel = tk.Label(dpframe, text= "Functions", font = ('Helvetica', 14))
         dpflabel.grid()        
         #these are the bottons which each has a command that connects to a function with a specific purpose.
-        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 12, command = self.fs)
+        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 18, command = self.fs)
         dpfbutton2 = tk.Button(dpframe, text = "Filter by", font = ('Helvetica', 12), width = 12, command = self.viewall)
-        dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12)
+        dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12, command = self.delmusic)
         dpfbutton4 = tk.Button(dpframe, text = "Delete Multiple Songs", font = ('Helvetica', 12))
         dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12)
         dpfbutton6 = tk.Button(dpframe, text="Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
@@ -207,13 +208,13 @@ class Kobraslib():
         dpfbutton1.grid(row = 0, column = 1, padx = 10, pady = 10)
         dpfbutton2.grid(row = 0, column = 2, padx = 10, pady = 10)
         dpfbutton3.grid(row = 0, column = 3, padx = 10, pady = 10)
-        dpfbutton4.grid(row = 0, column = 4, padx = 10, pady = 10)
-        dpfbutton5.grid(row = 0, column = 5, padx = 10, pady = 10)
-        dpfbutton6.grid(row=0, column=6, padx=10, pady=10)
+        dpfbutton4.grid(row = 1, column = 1, padx = 10, pady = 10)
+        dpfbutton5.grid(row = 1, column = 2, padx = 10, pady = 10)
+        dpfbutton6.grid(row = 1, column = 3, padx = 10, pady = 10)
 
 
 
-        
+        "SELECT"
 
         
         
@@ -225,30 +226,91 @@ class Kobraslib():
         return self.display #used so that I can use the info from it within other stuff
 
     def refresh_treeview(self):
+        """
+        This will be used as a button for refreshing data so that you won't have to
+        close and reopen the app for it to work
+        """
         # Clear current rows
         for row in self.dbtree.get_children():
             self.dbtree.delete(row)
 
         # Re-query the DB
         connection = get_con("tutorial.db")
-        query = "SELECT title, artist, length, bpm, Date, key FROM kobraslib"
+        query = "SELECT id, title, artist, length, bpm, Date, key, genre FROM kobraslib"
 
         rows = connection.execute(query).fetchall()
-        connection.close()
+        
 
         # Re-insert with alternating tags
         muse = 0
         for row in rows:
-            tag = 'evenrow' if muse % 2 == 0 else 'oddrow' # peep the conditional expression
+            dbid = row[0]
+            songdata = row[1:] #everything but the id
+            
+            tag = 'evenrow' if muse % 2 == 0 else 'oddrow'
+            
             self.dbtree.insert(
-                parent="",
-                index="end",
-                iid=muse,
-                text=str(muse),
-                values=row,
-                tags=(tag,)
+                parent = "",
+                index = "end",
+                iid = dbid,
+                text = str(muse),
+                values = songdata,
+                tags = (tag,)
             )
             muse += 1
+        
+        connection.close()
+        
+    
+    def delmusic(self):
+        """
+        A function that will be used as a delete button command
+        - Allow user to delete what they cliack, or delete by the ID of the song.
+        - Will automatically use self.refresh to update after deletion, maybe ask a pop up
+        
+        - ask pop up, are you sure you wanna delete
+        
+        
+        """
+        # Get the selected item from treeview
+        selected = self.dbtree.selection()
+        
+        item = self.dbtree.item(selected[0])
+        values = item['values']  # This gets [title, artist, length, bpm, date, key, genre]
+        title = values[0]
+        artist = values[1]
+        
+        confirm = messagebox.askyesno("Confirm Delete",        # asks question for confirmation
+                              "Are you sure you want to delete this song?")
+        
+        if confirm:
+            connection = get_con("tutorial.db")
+            query = "DELETE FROM kobraslib WHERE id = ?"    #giving parameter so that there isn't direct SQL implementation
+            try:
+                with connection:
+                    connection.execute(query, ((selected[0]),))  #the comma is for the code to to know that it is a tutple
+                    message = f"{title} by {artist} was deleted :("  #instead of just printing the id of the song, the title and artist get printed
+                    num = 1
+                    self.popup(num, message)
+            except Exception as e:
+                message = str(e)
+                num = 2 
+                self.popup(num, message)
+            self.refresh_treeview()
+        elif not confirm:
+            self.popup(2, f"{title} by {artist} was deleted :)")
+            return
+    
+        # Checking if something is selected
+        if not selected:
+            self.popup(2, "Please select a song to delete!")
+            
+        print(self.dbtree.item(selected[0])) # prints all data from the song
+           
+            
+            
+            
+    
     def popup(self, num, message):
         """
         Docstring for popup
@@ -284,7 +346,9 @@ class Kobraslib():
         self.kbfile
         
         if not self.kbfile:          #used if the user does not select a file
-            print("No File selected.")
+            num = 1
+            message = "No File Selected"
+            self.popup(num, message)
             return 
         
         audio = MP3(self.kbfile)
@@ -304,15 +368,17 @@ class Kobraslib():
         rawbpm = tags.get('bpm')  # returns None or ['120']
         
         
-        def detect_key(file):
+        def detect_key(self, file):
             y, sr = librosa.load(file, sr=None)
             chroma = librosa.feature.chroma_stft(y=y, sr=sr)  # chroma features
             avg_chroma = np.mean(chroma, axis=1)
-            keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] #list of all possible keys in order
+            keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
             detected = keys[np.argmax(avg_chroma)]
             return detected
         
         key = detect_key(self.kbfile)
+        
+        genre = tags.get('genre', ['Unknown'])[0]
 
         if rawbpm:
             bpm = int(float(rawbpm[0]))  # removes trailing .0
@@ -326,25 +392,27 @@ class Kobraslib():
                      "Length": lstr,
                      "BPM": bpm,
                      "Date": date,
-                     "Key": key}
+                     "Key": key,
+                     "Genre": genre}
         
         
-
+        
         self.musicdict = musicdict
+        connection = get_con("tutorial.db")
     
         
         connection = get_con("tutorial.db")
         try:
             #creation of table
             create_table(connection)
-            self.insertsong(connection, musicdict["Title"], musicdict["Artist"], musicdict["Length"], musicdict["BPM"], kobra.musicdict["Date"], kobra.musicdict["Key"])
-            self.refresh_treeview
+            self.insertsong(connection, musicdict["Title"], musicdict["Artist"], musicdict["Length"], 
+                            musicdict["BPM"], kobra.musicdict["Date"], kobra.musicdict["Key"], musicdict["Genre"])
+            
             return musicdict
         finally:
             connection.close()  #for saftey reasons always want to close
         
-        
-    def insertsong(self, connection, title, artist, length, bpm, Date, Key):
+    def insertsong(self, connection, title, artist, length, bpm, Date, Key, genre):
         """
         Docstring for insertsong
         Args:
@@ -357,12 +425,12 @@ class Kobraslib():
         Side Effects:
 
         """
-        query = "INSERT INTO kobraslib (title, artist, length, bpm, Date, key) VALUES (?,?,?,?,?,?)"
+        query = "INSERT INTO kobraslib (title, artist, length, bpm, Date, key, genre) VALUES (?,?,?,?,?,?,?)"
         
         # inputing the values into the list
         try:
             with connection:
-                connection.execute(query, (title, artist, length, bpm, Date, Key))
+                connection.execute(query, (title, artist, length, bpm, Date, Key, genre))
             if "hi" =="hi":
                 num = 1
                 message = (f"The song: '{kobra.musicdict["Title"]}' was added!")
@@ -408,7 +476,7 @@ class Kobraslib():
         """
         query = """
         CREATE TABLE IF NOT EXISTS kobraslib (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             artist TEXT,
             length INTEGER,
@@ -519,7 +587,7 @@ def create_table (connection):
     """
     query = """
     CREATE TABLE IF NOT EXISTS kobraslib (
-        id INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         artist TEXT,
         length INTEGER,
