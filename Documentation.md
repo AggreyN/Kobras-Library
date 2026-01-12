@@ -150,7 +150,10 @@ I will now start working on filtering, using the deleting button and the other b
 
 
 
+1/12/25
 
+    Did a lot but filtering will be focused on today as well as API o stuff to finish
+    it off, I can finish this within the next few days if I lock in.
 
 
 _References_
