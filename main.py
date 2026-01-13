@@ -23,11 +23,11 @@ import tkinter as tk # for my GUI
 from tkinter import filedialog # for the open file thing
 from tkinter import ttk   #for my tree view display
 from tkinter import messagebox #for the alerts or messages that might pop up
+from tkinter import simpledialog #for when theres a pop up where you would have to enter something
+
 
 import sqlite3  #used for my databases
 
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials # in order for my code to talk to spotify
 
 
 
@@ -275,6 +275,10 @@ class Kobraslib():
         # Get the selected item from treeview
         selected = self.dbtree.selection()
         
+        # Checking if something is selected
+        if not selected:
+            self.popup(2, "Please select a song to delete!")
+    
         item = self.dbtree.item(selected[0])
         values = item['values']  # This gets [title, artist, length, bpm, date, key, genre]
         title = values[0]
@@ -301,9 +305,7 @@ class Kobraslib():
             self.popup(2, f"{title} by {artist} was deleted :)")
             return
     
-        # Checking if something is selected
-        if not selected:
-            self.popup(2, "Please select a song to delete!")
+        
             
         print(self.dbtree.item(selected[0])) # prints all data from the song
            
@@ -329,6 +331,8 @@ class Kobraslib():
             messagebox.showinfo("Hello!", message)   # ~.showinfo("title", "message")
         elif num == 2:
             messagebox.showerror("Error!!!", message)
+        elif num == 3 and message == None:
+            messagebox.askquestion("You will filter by:")
         
     def filescanner(self):
         """
@@ -368,15 +372,8 @@ class Kobraslib():
         rawbpm = tags.get('bpm')  # returns None or ['120']
         
         
-        def detect_key(self, file):
-            y, sr = librosa.load(file, sr=None)
-            chroma = librosa.feature.chroma_stft(y=y, sr=sr)  # chroma features
-            avg_chroma = np.mean(chroma, axis=1)
-            keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-            detected = keys[np.argmax(avg_chroma)]
-            return detected
         
-        key = detect_key(self.kbfile)
+        key = self.detect_key(self.kbfile)
         
         genre = tags.get('genre', ['Unknown'])[0]
 
@@ -411,6 +408,23 @@ class Kobraslib():
             return musicdict
         finally:
             connection.close()  #for saftey reasons always want to close
+    def detect_key(self, file):
+            """
+            Docstring for detect_key
+            
+            Used in the filescanner function for detecing the key of the file.
+            
+            Args:
+                file(str): This is the file line that contains the music
+            Returns:
+                detected(str): The string of the key of the file
+            """
+            y, sr = librosa.load(file, sr=None)
+            chroma = librosa.feature.chroma_stft(y=y, sr=sr)  # chroma features
+            avg_chroma = np.mean(chroma, axis=1)
+            keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+            detected = keys[np.argmax(avg_chroma)]
+            return detected
         
     def insertsong(self, connection, title, artist, length, bpm, Date, Key, genre):
         """
@@ -442,7 +456,7 @@ class Kobraslib():
                 message = "You already put this song in the database. \nPlease input a different song!"
                 self.popup(num, message) #pop up code
     
-    def viewall(self, connection= None, condition = None ):
+    def viewall(self, condition = None ):
         """
         Args:
             Connection(str): The connection to the db
@@ -451,7 +465,9 @@ class Kobraslib():
         """
         connection = get_con("tutorial.db")
         
-        query = "SELECT * FROM kobraslib"
+        artist = self.popup(3, None)
+        artist
+        query = f"SELECT * FROM kobraslib WHERE artist = {artist}"
         if condition:  #this will be where people will request the organizaion
             query += f"WHERE {condition}"
         
