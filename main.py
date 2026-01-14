@@ -199,10 +199,10 @@ class Kobraslib():
         dpflabel.grid()        
         #these are the bottons which each has a command that connects to a function with a specific purpose.
         dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 18, command = self.fs)
-        dpfbutton2 = tk.Button(dpframe, text = "Filter by", font = ('Helvetica', 12), width = 12, command = self.viewall)
+        dpfbutton2 = tk.Button(dpframe, text = "Filter by", font = ('Helvetica', 12), width = 12, command = self.filterby)
         dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12, command = self.delmusic)
         dpfbutton4 = tk.Button(dpframe, text = "Delete Multiple Songs", font = ('Helvetica', 12))
-        dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12)
+        dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12, command = self.exitmenu)
         dpfbutton6 = tk.Button(dpframe, text="Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
         
         dpfbutton1.grid(row = 0, column = 1, padx = 10, pady = 10)
@@ -212,11 +212,7 @@ class Kobraslib():
         dpfbutton5.grid(row = 1, column = 2, padx = 10, pady = 10)
         dpfbutton6.grid(row = 1, column = 3, padx = 10, pady = 10)
 
-
-
-        "SELECT"
-
-        
+     
         
  
 
@@ -260,7 +256,14 @@ class Kobraslib():
             muse += 1
         
         connection.close()
+    
+    def exitmenu(self):
+        """
+        Docstring for exitmenu
         
+        This will just close the menu when pressed.
+        """
+        self.display.destroy()  
     
     def delmusic(self):
         """
@@ -313,7 +316,7 @@ class Kobraslib():
             
             
     
-    def popup(self, num, message):
+    def popup(self, num, message = None):
         """
         Docstring for popup
         
@@ -332,7 +335,7 @@ class Kobraslib():
         elif num == 2:
             messagebox.showerror("Error!!!", message)
         elif num == 3 and message == None:
-            messagebox.askquestion("You will filter by:")
+            simpledialog.askstring("You will filter by:", "Filter by:")
         
     def filescanner(self):
         """
@@ -456,7 +459,7 @@ class Kobraslib():
                 message = "You already put this song in the database. \nPlease input a different song!"
                 self.popup(num, message) #pop up code
     
-    def viewall(self, condition = None ):
+    def filterby(self, condition = None ):
         """
         Args:
             Connection(str): The connection to the db
@@ -465,8 +468,9 @@ class Kobraslib():
         """
         connection = get_con("tutorial.db")
         
-        artist = self.popup(3, None)
+        artist = self.popup(3)
         artist
+        
         query = f"SELECT * FROM kobraslib WHERE artist = {artist}"
         if condition:  #this will be where people will request the organizaion
             query += f"WHERE {condition}"
@@ -476,10 +480,8 @@ class Kobraslib():
                 rows = connection.execute(query).fetchall() #this will print everything within the query
             return rows
         except Exception as e:
-            print(e)
+            self.popup(2, str(e))
         
-        for song in connection:     #recursive
-            print(song)
             
         connection.close()
     def create_table (self,connection):
@@ -529,7 +531,6 @@ class Kobraslib():
     
 
     
-def hi():
     music_folder = "C:\\Users\\aggre\\OneDrive\\Documents\\Coding Projects\\Kobras-Library\\MusicExamples"
     music_files = []
 
