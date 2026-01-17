@@ -155,6 +155,14 @@ I will now start working on filtering, using the deleting button and the other b
     Did a lot but filtering will be focused on today as well as API o stuff to finish
     it off, I can finish this within the next few days if I lock in.
 
+12/16/25 
+
+    Sometimes when I try to add some music, it takes too long for the "[song] has been added"
+    message to pop. Aesthetic wise I did not like it so I looked up, using ai unfortunately,
+    why that was the case and it was because the librosa module makes it so that the whole 
+    song is saved into memory and then analyzed to get the key. So I have to import this
+    "threading" module so I will try to figure out how to do that.
+
 
 _References_
 
@@ -184,4 +192,10 @@ librosa.feature.tempo
     - https://librosa.org/doc/main/generated/librosa.feature.tempo.html
 
 
+threading — Thread-based parallelism
+    - https://docs.python.org/3/library/threading.html
 
+
+Dropdown Menus With TKinter - Python Tkinter GUI Tutorial #18
+    - https://youtu.be/3E_fK5hCUnI
+    
