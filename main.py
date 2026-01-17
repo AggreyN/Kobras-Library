@@ -198,19 +198,33 @@ class Kobraslib():
         dpflabel = tk.Label(dpframe, text= "Functions", font = ('Helvetica', 14))
         dpflabel.grid()        
         #these are the bottons which each has a command that connects to a function with a specific purpose.
-        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 18, command = self.fs)
+        dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 13, command = self.fs)
         dpfbutton2 = tk.Button(dpframe, text = "Filter by", font = ('Helvetica', 12), width = 12, command = self.filterby)
         dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12, command = self.delmusic)
-        dpfbutton4 = tk.Button(dpframe, text = "Delete Multiple Songs", font = ('Helvetica', 12))
+        dpfbutton4 = tk.Button(dpframe, text = "Delete All Songs", font = ('Helvetica', 12))
         dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12, command = self.exitmenu)
-        dpfbutton6 = tk.Button(dpframe, text="Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
+        dpfbutton6 = tk.Button(dpframe, text = "Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
         
-        dpfbutton1.grid(row = 0, column = 1, padx = 10, pady = 10)
-        dpfbutton2.grid(row = 0, column = 2, padx = 10, pady = 10)
-        dpfbutton3.grid(row = 0, column = 3, padx = 10, pady = 10)
-        dpfbutton4.grid(row = 1, column = 1, padx = 10, pady = 10)
-        dpfbutton5.grid(row = 1, column = 2, padx = 10, pady = 10)
-        dpfbutton6.grid(row = 1, column = 3, padx = 10, pady = 10)
+        dpfbutton7 = tk.Button(dpframe, text = "Filter by Artist", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
+        dpfbutton8 = tk.Button(dpframe, text = "Filter by BPM", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
+        dpfbutton9 = tk.Button(dpframe, text = "Filter by Date", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
+        dpfbutton10 = tk.Button(dpframe, text = "Filter by Genre", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
+        dpfbutton11 = tk.Button(dpframe, text = "Filter by Key", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
+
+        
+        
+        
+        dpfbutton1.grid(row = 1, column = 0, padx = 10, pady = 10)
+        dpfbutton2.grid(row = 0, column = 0, padx = 10, pady = 10)
+        dpfbutton3.grid(row = 1, column = 1, padx = 10, pady = 10)
+        dpfbutton4.grid(row = 1, column = 2, padx = 10, pady = 10)
+        dpfbutton5.grid(row = 1, column = 3, padx = 10, pady = 10)
+        dpfbutton6.grid(row = 1, column = 4, padx = 10, pady = 10)
+        dpfbutton7.grid(row = 0, column = 1, padx = 10, pady = 10)
+        dpfbutton8.grid(row = 0, column = 2, padx = 10, pady = 10)
+        dpfbutton9.grid(row = 0, column = 3, padx = 10, pady = 10)
+        dpfbutton10.grid(row = 0, column = 4, padx = 10, pady = 10)
+        dpfbutton11.grid(row = 0, column = 5, padx = 10, pady = 10)
 
      
         
@@ -335,7 +349,7 @@ class Kobraslib():
         elif num == 2:
             messagebox.showerror("Error!!!", message)
         elif num == 3 and message == None:
-            simpledialog.askstring("You will filter by:", "Filter by:")
+            self.filterArt = simpledialog.askstring("You will filter by:", "Filter by:")
         
     def filescanner(self):
         """
@@ -555,20 +569,10 @@ class Kobraslib():
 
     mp3_file = EasyID3(prefix + 'Molotov.mp3')
     print("MP3 Tags:")
-    pprint.pprint(mp3_file) #this is to have the files print out nice 
+    print(mp3_file) #this is to have the files print out nice 
 
 
 
-    # Access specific tags:
-    print(f"Title: {mp3_file['title']}")
-    print(f"Artist: {mp3_file['artist']}")
-    
-    print(f"Title: {title}")
-    print(f"Artist: {artist}")
-    print(f"Length: {lstr}")
-    print(f"BPM: {bpm}")
-    print(f"Date: {date}")
-        
 
 # after watching a youtube video, I think that it is easier to run things 
 # through functions for sql.
