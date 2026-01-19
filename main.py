@@ -205,11 +205,11 @@ class Kobraslib():
         dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12, command = self.exitmenu)
         dpfbutton6 = tk.Button(dpframe, text = "Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
         
-        dpfbutton7 = tk.Button(dpframe, text = "Filter by Artist", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
-        dpfbutton8 = tk.Button(dpframe, text = "Filter by BPM", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
-        dpfbutton9 = tk.Button(dpframe, text = "Filter by Date", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
-        dpfbutton10 = tk.Button(dpframe, text = "Filter by Genre", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
-        dpfbutton11 = tk.Button(dpframe, text = "Filter by Key", font=('Helvetica', 12), width=12, command = self.refresh_treeview)
+        dpfbutton7 = tk.Button(dpframe, text = "Filter by Artist", font=('Helvetica', 12), width = 12, command = self.fpopup("artist"))
+        dpfbutton8 = tk.Button(dpframe, text = "Filter by BPM", font=('Helvetica', 12), width = 12, command = self.fpopup("bpm"))
+        dpfbutton9 = tk.Button(dpframe, text = "Filter by Date", font=('Helvetica', 12), width = 12, command = self.fpopup("Date"))
+        dpfbutton10 = tk.Button(dpframe, text = "Filter by Genre", font=('Helvetica', 12), width = 12, command = self.fpopup("genre"))
+        dpfbutton11 = tk.Button(dpframe, text = "Filter by Key", font=('Helvetica', 12), width = 12, command = self.fpopup("key"))
 
         
         
@@ -327,8 +327,84 @@ class Kobraslib():
         print(self.dbtree.item(selected[0])) # prints all data from the song
            
             
-            
-            
+    def fpopup(self, column):
+        """
+        Asks whether the filter is genral or specific and then applies it
+        
+        Args:
+            column(str): The Column that will be filtered
+        Returns:
+            and updated treevie
+        """     
+        
+        choice = messagebox.askquestion(
+        "Filter Type",
+        f"Do you want a GENERAL filter or a SPECIFIC filter for {column}?\n\n"
+        "Yes = Specific\nNo = General"
+    )
+
+        connection = get_con("tutorial.db")
+
+        try:
+            if choice == "yes":
+                # Specific value filter
+                value = simpledialog.askstring(
+                    "Specific Filter",
+                    f"Enter value for {column} (e.g. E#, 128, Hip-Hop):"
+                )
+
+                if not value:
+                    return
+
+                query = f"""
+                    SELECT id, title, artist, length, bpm, Date, key, genre
+                    FROM kobraslib
+                    WHERE {column} = ?
+                """
+                rows = connection.execute(query, (value,)).fetchall()
+
+            else:
+                # General filter (group / show all unique)
+                query = f"""
+                    SELECT DISTINCT {column}
+                    FROM kobraslib
+                    ORDER BY {column}
+                """
+                rows = connection.execute(query).fetchall()
+
+                values = "\n".join(str(r[0]) for r in rows)
+                messagebox.showinfo(
+                    f"All {column} values",
+                    values if values else "No data found"
+                )
+                return
+
+            self.update_trvrows(rows)
+
+        except Exception as e:
+            self.popup(2, str(e))
+        finally:
+            connection.close()
+    def update_trvrows(self, rows):
+        """
+        Clears and repopulates treeview using provided DB rows.
+        
+        Args
+        """
+
+        for item in self.dbtree.get_children(): #delets everything within the 
+            self.dbtree.delete(item)
+
+        for index, row in enumerate(rows):
+            tag = "evenrow" if index % 2 == 0 else "oddrow" #anoter conditional expression my professor would be proud
+            self.dbtree.insert(
+                parent="",
+                index="end",
+                iid=row[0],
+                text=str(index),
+                values=row[1:],
+                tags=(tag,)
+            )
     
     def popup(self, num, message = None):
         """
@@ -505,6 +581,7 @@ class Kobraslib():
         Side Effects:
             Creates the table that I need 
         Query - A query is a request for data stored in a data 
+        The unique title/artist makes sure that there is no duplciates within it
         """
         query = """
         CREATE TABLE IF NOT EXISTS kobraslib (
@@ -512,7 +589,7 @@ class Kobraslib():
             title TEXT NOT NULL,
             artist TEXT,
             length INTEGER,
-            bpm TEXT,
+            bpm INTEGER,
             Date INTEGER,
             genre TEXT,
             key TEXT,
