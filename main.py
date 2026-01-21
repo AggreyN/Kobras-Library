@@ -201,16 +201,19 @@ class Kobraslib():
         dpfbutton1 = tk.Button(dpframe, text = "Add New Song", font = ('Helvetica', 12), width = 13, command = self.fs)
         dpfbutton2 = tk.Button(dpframe, text = "Filter by", font = ('Helvetica', 12), width = 12, command = self.filterby)
         dpfbutton3 = tk.Button(dpframe, text = "Delete Song", font = ('Helvetica', 12), width = 12, command = self.delmusic)
-        dpfbutton4 = tk.Button(dpframe, text = "Delete All Songs", font = ('Helvetica', 12))
+        dpfbutton4 = tk.Button(dpframe, text = "Delete All Songs", font = ('Helvetica', 12), width = 12, command =self.delete_all)
         dpfbutton5 = tk.Button(dpframe, text = "Exit Menu", font = ('Helvetica', 12), width = 12, command = self.exitmenu)
         dpfbutton6 = tk.Button(dpframe, text = "Refresh", font=('Helvetica', 12), width=12, command=self.refresh_treeview)
         
-        dpfbutton7 = tk.Button(dpframe, text = "Filter by Artist", font=('Helvetica', 12), width = 12, command = self.fpopup("artist"))
-        dpfbutton8 = tk.Button(dpframe, text = "Filter by BPM", font=('Helvetica', 12), width = 12, command = self.fpopup("bpm"))
-        dpfbutton9 = tk.Button(dpframe, text = "Filter by Date", font=('Helvetica', 12), width = 12, command = self.fpopup("Date"))
-        dpfbutton10 = tk.Button(dpframe, text = "Filter by Genre", font=('Helvetica', 12), width = 12, command = self.fpopup("genre"))
-        dpfbutton11 = tk.Button(dpframe, text = "Filter by Key", font=('Helvetica', 12), width = 12, command = self.fpopup("key"))
+        dpfbutton7 = tk.Button(dpframe, text = "Filter by Artist", font=('Helvetica', 12), width = 12, command = lambda: self.fpopup("artist"))
+        dpfbutton8 = tk.Button(dpframe, text = "Filter by BPM", font=('Helvetica', 12), width = 12, command = lambda: self.fpopup("bpm"))
+        dpfbutton9 = tk.Button(dpframe, text = "Filter by Date", font=('Helvetica', 12), width = 12, command = lambda: self.fpopup("Date"))
+        dpfbutton10 = tk.Button(dpframe, text = "Filter by Genre", font=('Helvetica', 12), width = 12, command = lambda: self.fpopup("genre"))
+        dpfbutton11 = tk.Button(dpframe, text = "Filter by Key", font=('Helvetica', 12), width = 12, command = lambda: self.fpopup("key"))
 
+        # When I ran the cade originally, all the popups came at the same time so
+        # what I did was use lambda so that I could still have the column name
+        # that were parameters
         
         
         
@@ -362,25 +365,40 @@ class Kobraslib():
                     WHERE {column} = ?
                 """
                 rows = connection.execute(query, (value,)).fetchall()
-
-            else:
-                # General filter (group / show all unique)
-                query = f"""
-                    SELECT DISTINCT {column}
+                self.update_trvrows(rows)
+            elif column == "key" and choice != "yes":
+                #Creating an order for the key values 
+                query = """
+                    SELECT id, title, artist, length, bpm, Date, key, genre
                     FROM kobraslib
-                    ORDER BY {column}
+                    ORDER BY CASE key
+                        WHEN 'C' THEN 1
+                        WHEN 'C#' THEN 2
+                        WHEN 'D' THEN 3
+                        WHEN 'D#' THEN 4
+                        WHEN 'E' THEN 5
+                        WHEN 'F' THEN 6
+                        WHEN 'F#' THEN 7
+                        WHEN 'G' THEN 8
+                        WHEN 'G#' THEN 9
+                        WHEN 'A' THEN 10
+                        WHEN 'A#' THEN 11
+                        WHEN 'B' THEN 12
+                    END ASC
                 """
                 rows = connection.execute(query).fetchall()
-
-                values = "\n".join(str(r[0]) for r in rows)
-                messagebox.showinfo(
-                    f"All {column} values",
-                    values if values else "No data found"
-                )
+                self.update_trvrows(rows)
                 return
 
-            self.update_trvrows(rows)
-
+            else:
+                query = f"""
+                    SELECT id, title, artist, length, bpm, Date, key, genre
+                    FROM kobraslib
+                    ORDER BY {column} ASC
+                """
+                rows = connection.execute(query).fetchall()
+                self.update_trvrows(rows)
+        
         except Exception as e:
             self.popup(2, str(e))
         finally:
@@ -468,7 +486,23 @@ class Kobraslib():
         
         key = self.detect_key(self.kbfile)
         
-        genre = tags.get('genre', ['Unknown'])[0]
+        # 1. Try embedded tag
+        raw_genre = tags.get('genre')
+        genre = raw_genre[0].strip() if raw_genre and raw_genre[0].strip() else None
+
+        if not genre:
+            genre = self.fetchgenre(artist, title)
+
+        if not genre:
+            genre = simpledialog.askstring(
+                "Genre Required",
+                "Genre could not be determined.\nPlease enter one:"
+            )
+            if not genre:
+                return
+
+        genre = genre.strip().title()
+                
 
         if rawbpm:
             bpm = int(float(rawbpm[0]))  # removes trailing .0
@@ -501,6 +535,93 @@ class Kobraslib():
             return musicdict
         finally:
             connection.close()  #for saftey reasons always want to close
+    def delete_all(self):
+        """
+        Delete all songs from database with double confirmation
+        """
+        confirm = messagebox.askyesno(
+            "DANGER!", 
+            "Are you ABSOLUTELY SURE you want to delete ALL songs?\n\nThis cannot be undone!"
+        )
+        
+        if confirm:
+            # Double confirm
+            double_confirm = messagebox.askyesno(
+                "Final Warning",
+                "This will permanently delete your entire library. Continue?"
+            )
+            
+            if double_confirm:
+                connection = get_con("tutorial.db")
+                try:
+                    with connection:
+                        connection.execute("DELETE FROM kobraslib")
+                    self.popup(1, "All songs deleted!")
+                    self.refresh_treeview() #automatically refreshing screen
+                except Exception as e:
+                    self.popup(2, f"Error: {str(e)}")
+                finally:
+                    connection.close()
+
+
+    def fetchgenre(self, artist, title):
+        """
+        Fetches genre from MusicBrainz API based on artist and title.
+        
+        Args:
+            artist (str): The artist name
+            title (str): The song title
+        
+        Returns:
+            str or None: The genre if found, otherwise None
+        """
+        import requests
+        import time
+        
+        try:
+            # MusicBrainz requires a User-Agent header
+            headers = {
+                'User-Agent': 'KobrasLibrary/1.0 (ayertey.narh.24@gmail.com)'
+            }
+            
+            # Search for the recording
+            search_url = "https://musicbrainz.org/ws/2/recording/"
+            params = {
+                'query': f'recording:"{title}" AND artist:"{artist}"',
+                'fmt': 'json',
+                'limit': 1
+            }
+            
+            response = requests.get(search_url, params=params, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get('recordings'):
+                    recording_id = data['recordings'][0]['id']
+                    
+                    # Get tags for this recording
+                    time.sleep(1)  # Rate limiting - be nice to MusicBrainz
+                    tags_url = f"https://musicbrainz.org/ws/2/recording/{recording_id}"
+                    tag_params = {'inc': 'tags', 'fmt': 'json'}
+                    
+                    tag_response = requests.get(tags_url, params=tag_params, headers=headers)
+                    
+                    if tag_response.status_code == 200:
+                        tag_data = tag_response.json()
+                        tags = tag_data.get('tags', [])
+                        
+                        if tags:
+                            # Return the most popular tag (highest count)
+                            top_tag = max(tags, key=lambda x: x.get('count', 0))
+                            return top_tag['name'].title()
+            
+            return None
+            
+        except Exception as e:
+            print(f"MusicBrainz fetch error: {e}")
+        return None
+
     def detect_key(self, file):
             """
             Docstring for detect_key
@@ -689,7 +810,7 @@ def create_table (connection):
         title TEXT NOT NULL,
         artist TEXT,
         length INTEGER,
-        bpm TEXT,
+        bpm INTEGER,
         Date INTEGER,
         genre TEXT,
         key TEXT,
