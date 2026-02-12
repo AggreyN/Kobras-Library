@@ -26,10 +26,10 @@ from tkinter import messagebox #for the alerts or messages that might pop up
 from tkinter import simpledialog #for when theres a pop up where you would have to enter something
 
 
-import sqlite3  #used for my databases
+import sqlite3  # used for my databases
 
-
-
+import requests # used for my API requests
+import time 
 
 class Kobraslib():
     """
@@ -108,10 +108,10 @@ class Kobraslib():
         
         #creating frame
         dbtreefame = tk.Frame(self.display)
-        dbtreefame.pack(pady = 10, fill = "x")
+        dbtreefame.pack(pady = 10, fill = "both", expand = True)
         
         dbtfscrool = tk.Scrollbar (dbtreefame)
-        dbtfscrool.pack(side = "right", fill = "both")
+        dbtfscrool.pack(side = "right", fill = "y")
         
         #setting up treeview in order to see the d
         self.dbtree = ttk.Treeview(dbtreefame, yscrollcommand = dbtfscrool.set, selectmode = "extended") 
@@ -150,7 +150,7 @@ class Kobraslib():
         self.dbtree.tag_configure('oddrow', background = "white")
         self.dbtree.tag_configure('evenrow', background = "#E1B57D")
         
-        # Add data with a for loop
+        # Add data with a for loopS
         
         connection = get_con("tutorial.db")
 
@@ -187,7 +187,7 @@ class Kobraslib():
                 
         
         
-        self.dbtree.pack()
+        self.dbtree.pack(fill = "both", expand = True)
 
        
         #this frame will have all the buttons in order to work the library 
@@ -507,8 +507,12 @@ class Kobraslib():
         if rawbpm:
             bpm = int(float(rawbpm[0]))  # removes trailing .0
         else:
-            bpm = "N/A"
-
+            print("No BPM tag found, detecting from audio...")
+            bpm = self.detect_bpm(self.kbfile)  # ← Detect from audio!
+            
+            if not bpm:
+                bpm = None  # Last resort
+        
         date = tags.get('date', ['N/A'])[0]
         
         musicdict = {"Title": title,    # creating a dict that will be used to iterate into the db
@@ -529,12 +533,40 @@ class Kobraslib():
         try:
             #creation of table
             create_table(connection)
-            self.insertsong(connection, musicdict["Title"], musicdict["Artist"], musicdict["Length"], 
-                            musicdict["BPM"], kobra.musicdict["Date"], kobra.musicdict["Key"], musicdict["Genre"])
+            self.insertsong(connection, self.musicdict["Title"], self.musicdict["Artist"], self.musicdict["Length"], 
+                            self.musicdict["BPM"], self.musicdict["Date"], self.musicdict["Key"], self.musicdict["Genre"])
             
             return musicdict
         finally:
             connection.close()  #for saftey reasons always want to close
+    def detect_bpm(self, file):
+        """
+        Detect BPM from audio file using librosa
+        
+        Args:
+            file (str): Path to the audio file
+        
+        Returns:
+            int: Detected BPM value
+        """
+        try:
+            # Load audio file
+            y, sr = librosa.load(file, sr=None, duration=30)  # Only analyze first 30 seconds for speed
+            
+            # Detect tempo (BPM)
+            tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+            
+            # Round to nearest integer
+            bpm = int(round(tempo))
+            
+            print(f"Detected BPM: {bpm}")
+            return bpm
+            
+        except Exception as e:
+            print(f"BPM detection error: {e}")
+            return None
+    
+    
     def delete_all(self):
         """
         Delete all songs from database with double confirmation
@@ -575,8 +607,6 @@ class Kobraslib():
         Returns:
             str or None: The genre if found, otherwise None
         """
-        import requests
-        import time
         
         try:
             # MusicBrainz requires a User-Agent header
@@ -661,7 +691,7 @@ class Kobraslib():
                 connection.execute(query, (title, artist, length, bpm, Date, Key, genre))
             if "hi" =="hi":
                 num = 1
-                message = (f"The song: '{kobra.musicdict["Title"]}' was added!")
+                message = (f"The song: '{self.musicdict["Title"]}' was added!")
                 self.popup(num, message)    #pop up code
 
         except Exception as e:
@@ -766,8 +796,6 @@ class Kobraslib():
     #pulling from a file and displaying the tags
 
     mp3_file = EasyID3(prefix + 'Molotov.mp3')
-    print("MP3 Tags:")
-    print(mp3_file) #this is to have the files print out nice 
 
 
 
