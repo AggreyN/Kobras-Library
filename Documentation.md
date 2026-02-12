@@ -198,4 +198,7 @@ threading — Thread-based parallelism
 
 Dropdown Menus With TKinter - Python Tkinter GUI Tutorial #18
     - https://youtu.be/3E_fK5hCUnI
-    
+
+
+MusicBrainz API
+    - https://musicbrainz.org/doc/MusicBrainz_API
